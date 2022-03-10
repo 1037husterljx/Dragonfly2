@@ -34,6 +34,7 @@ var (
 	StatSeedLogFileName   = "stat/seed.log"
 	DownloaderLogFileName = "downloader.log"
 	KeepAliveLogFileName  = "keepalive.log"
+	SqlLogFileName        = "sql.log"
 )
 
 const (

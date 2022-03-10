@@ -53,6 +53,10 @@ func InitManager(verbose, console bool, dir string) error {
 			fileName:             JobLogFileName,
 			setSugaredLoggerFunc: SetJobLogger,
 		},
+		{
+			fileName:      SqlLogFileName,
+			setLoggerFunc: SetSlowSqlLogger,
+		},
 	}
 
 	return createFileLogger(verbose, meta, logDir)
