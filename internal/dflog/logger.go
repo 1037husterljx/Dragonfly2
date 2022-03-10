@@ -27,15 +27,15 @@ import (
 )
 
 var (
-	CoreLogger       *zap.SugaredLogger
-	GrpcLogger       *zap.SugaredLogger
-	GCLogger         *zap.SugaredLogger
-	StorageGCLogger  *zap.SugaredLogger
-	JobLogger        *zap.SugaredLogger
-	KeepAliveLogger  *zap.SugaredLogger
-	StatSeedLogger   *zap.Logger
-	DownloaderLogger *zap.Logger
-
+	CoreLogger          *zap.SugaredLogger
+	GrpcLogger          *zap.SugaredLogger
+	GCLogger            *zap.SugaredLogger
+	StorageGCLogger     *zap.SugaredLogger
+	JobLogger           *zap.SugaredLogger
+	KeepAliveLogger     *zap.SugaredLogger
+	StatSeedLogger      *zap.Logger
+	DownloaderLogger    *zap.Logger
+	SqlLogger           *zap.Logger
 	coreLogLevelEnabler zapcore.LevelEnabler
 )
 
@@ -50,6 +50,7 @@ func init() {
 		SetGCLogger(sugar)
 		SetStorageGCLogger(sugar)
 		SetKeepAliveLogger(sugar)
+		SetSlowSqlLogger(log)
 		SetStatSeedLogger(log)
 		SetDownloadLogger(log)
 		SetJobLogger(sugar)
@@ -80,6 +81,10 @@ func SetStorageGCLogger(log *zap.SugaredLogger) {
 
 func SetKeepAliveLogger(log *zap.SugaredLogger) {
 	KeepAliveLogger = log
+}
+
+func SetSlowSqlLogger(log *zap.Logger) {
+	SlowSqlLogger = log
 }
 
 func SetStatSeedLogger(log *zap.Logger) {

@@ -645,7 +645,7 @@ func (s *Server) KeepAlive(stream manager.Manager_KeepAliveServer) error {
 	hostName := req.HostName
 	sourceType := req.SourceType
 	clusterID := uint(req.ClusterId)
-	logger.Infof("%s keepalive successfully for the first time in cluster %d", hostName, clusterID)
+	logger.KeepAliveLogger.Infof("%s keepalive successfully for the first time in cluster %d", hostName, clusterID)
 
 	// Initialize active scheduler.
 	if sourceType == manager.SourceType_SCHEDULER_SOURCE {

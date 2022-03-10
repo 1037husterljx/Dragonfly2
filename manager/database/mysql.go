@@ -49,7 +49,7 @@ func newMyqsl(cfg *config.Config) (*gorm.DB, error) {
 			SingularTable: true,
 		},
 		DisableForeignKeyConstraintWhenMigrating: true,
-		Logger:                                   zapgorm2.New(logger.CoreLogger.Desugar()),
+		Logger:                                   zapgorm2.New(logger.SlowSqlLogger),
 	})
 	if err != nil {
 		return nil, err
