@@ -57,6 +57,10 @@ func InitManager(verbose, console bool, dir string) error {
 			fileName:      SqlLogFileName,
 			setLoggerFunc: SetSlowSqlLogger,
 		},
+		{
+			fileName:      "slow_sql.log",
+			setLoggerFunc: SetSQLLogger,
+		},
 	}
 
 	return createFileLogger(verbose, meta, logDir)
