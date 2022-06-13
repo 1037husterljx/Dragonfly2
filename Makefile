@@ -272,6 +272,10 @@ test-coverage:
 	@cat cover.out >> coverage.txt
 .PHONY: test-coverage
 
+aone-test-coverage:
+	@go test -v -gcflags "all=-l" -race ${PKG_LIST} -coverprofile all.cover -covermode=atomic
+.PHONY: aone-test-coverage
+
 # Run github actions E2E tests with coverage
 actions-e2e-test-coverage:
 	@ginkgo -v -r --race --fail-fast --cover --trace --progress test/e2e

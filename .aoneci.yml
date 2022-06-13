@@ -1,0 +1,23 @@
+pipeline:
+  - 单元测试
+stage:
+  单元测试:
+    env:
+      setting: {}
+      image: 'cise/cise_7u2'
+    plugin:
+      -
+        param:
+          url: '${repo}'
+          branch: '${branch}'
+          path: '${source_root}'
+        name: checkout
+        pos: front
+      -
+        param:
+          coverage_dir: '${source_root}/'
+          path: '${teelog}'
+        name: golang_coverage_collector
+        pos: back
+    exec:
+      - "please config execute script in https://test.aone.alibaba-inc.com/project/965769/jobs/1745140/config?pipelineId=2944298"
