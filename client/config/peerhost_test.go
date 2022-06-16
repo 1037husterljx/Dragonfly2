@@ -225,7 +225,6 @@ func TestPeerHostOption_Load(t *testing.T) {
 		GCInterval: clientutil.Duration{
 			Duration: 60000000000,
 		},
-		WorkHome:    "/tmp/dragonfly/dfdaemon/",
 		DataDir:     "/var/lib/dragonfly/",
 		LogDir:      "/var/log/dragonfly/",
 		CacheDir:    "/var/cache/dragonfly/",
@@ -398,6 +397,7 @@ func TestPeerHostOption_Load(t *testing.T) {
 			},
 		},
 	}
+	peerHostOption.WorkHome = "/tmp/dragonfly/dfdaemon/"
 
 	peerHostOptionYAML := &DaemonOption{}
 	if err := peerHostOptionYAML.Load("./testdata/config/daemon.yaml"); err != nil {

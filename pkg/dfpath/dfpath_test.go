@@ -17,6 +17,7 @@
 package dfpath
 
 import (
+	"path/filepath"
 	"sync"
 	"testing"
 
@@ -62,9 +63,9 @@ func TestNew(t *testing.T) {
 				d, err := New(options...)
 				assert.NoError(err)
 				assert.Equal(d.WorkHome(), "foo")
-				assert.Equal(d.CacheDir(), DefaultCacheDir)
-				assert.Equal(d.LogDir(), DefaultLogDir)
-				assert.Equal(d.DataDir(), DefaultDataDir)
+				assert.Equal(d.CacheDir(), filepath.Join("foo", "cache"))
+				assert.Equal(d.LogDir(), filepath.Join("foo", "logs"))
+				assert.Equal(d.DataDir(), filepath.Join("foo", "data"))
 			},
 		},
 		{

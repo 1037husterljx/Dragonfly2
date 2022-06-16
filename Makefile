@@ -41,6 +41,16 @@ docker-push: docker-push-cdn docker-push-dfdaemon docker-push-scheduler docker-p
 	@echo "Push image done."
 .PHONY: docker-push
 
+# Push dragonfly images
+aone-push: aone-push-dfdaemon aone-push-scheduler aone-push-manager
+	@echo "Push image done."
+.PHONY: aone-push
+
+# Build dragonlfy
+aone-build: aone-build-dfdaemon aone-build-scheduler aone-build-manager
+	@echo "Build image done."
+.PHONY: aone-build
+
 # Build cdn image
 docker-build-cdn:
 	@echo "Begin to use docker build cdn image."
@@ -112,6 +122,24 @@ docker-push-manager: docker-build-manager
 	@echo "Begin to push manager docker image."
 	./hack/docker-push.sh manager
 .PHONY: docker-push-manager
+
+# Push dfdaemon image
+aone-push-dfdaemon:
+	@echo "Begin to push dfdaemon docker image."
+	./hack/aone-push.sh dfdaemon
+.PHONY: aone-push-dfdaemon
+
+# Push scheduler image
+aone-push-scheduler:
+	@echo "Begin to push scheduler docker image."
+	./hack/aone-push.sh scheduler
+.PHONY: aone-push-scheduler
+
+# Push manager image
+aone-push-manager:
+	@echo "Begin to push manager docker image."
+	./hack/aone-push.sh manager
+.PHONY: aone-push-manager
 
 # Build dragonfly
 build: build-cdn build-scheduler build-dfget build-dfcache build-manager

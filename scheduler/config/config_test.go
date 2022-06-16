@@ -17,6 +17,7 @@
 package config
 
 import (
+	logger "d7y.io/dragonfly/v2/internal/dflog"
 	"os"
 	"testing"
 	"time"
@@ -125,6 +126,7 @@ func TestConfig_New(t *testing.T) {
 			Listen: "0.0.0.0",
 			Port:   8002,
 		},
+		Log: logger.NewDefaultConfigs(),
 		Scheduler: &SchedulerConfig{
 			Algorithm:            "default",
 			BackSourceCount:      3,
