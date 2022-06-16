@@ -65,6 +65,24 @@ docker-build-manager:
 	./hack/docker-build.sh manager
 .PHONY: docker-build-manager
 
+# Build aone manager image
+aone-build-manager:
+	@echo "Begin to use docker build manager image."
+	D7Y_VERSION=$(GIT_COMMIT) ./hack/aone-build.sh manager
+.PHONY: aone-build-manager
+
+# Build aone manager image
+aone-build-scheduler:
+	@echo "Begin to use docker build manager image."
+	D7Y_VERSION=$(GIT_COMMIT) ./hack/aone-build.sh scheduler
+.PHONY: aone-build-scheduler
+
+# Build aone manager image
+aone-build-dfdaemon:
+	@echo "Begin to use docker build manager image."
+	D7Y_VERSION=$(GIT_COMMIT) ./hack/aone-build.sh dfdaemon
+.PHONY: aone-build-dfdaemon
+
 # Build testing tools image
 docker-build-testing-tools: build-dirs
 	@echo "Begin to testing tools image."
