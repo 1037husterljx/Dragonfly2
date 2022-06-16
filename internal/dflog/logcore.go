@@ -47,19 +47,55 @@ const (
 	encodeTimeFormat = "2006-01-02 15:04:05.000"
 )
 
+var DefaultLogConfig = LogConfig{
+	MaxSize:    defaultRotateMaxSize,
+	MaxBackups: defaultRotateMaxBackups,
+	MaxAge:     defaultRotateMaxBackups,
+	Compress:   false,
+	Structural: true,
+}
+
 var coreLevel = zap.NewAtomicLevelAt(zapcore.InfoLevel)
 var customCoreLevel atomic.Bool
 var grpcLevel = zap.NewAtomicLevelAt(zapcore.WarnLevel)
 var customGrpcLevel atomic.Bool
 
-func CreateLogger(filePath string, compress bool, stats bool, verbose bool) (*zap.Logger, zap.AtomicLevel, error) {
+type LogConfig struct {
+	// MaxSize is the maximum size in megabytes of the log file before it gets rotated.
+	// It defaults to 40 megabytes.
+	MaxSize int `yaml:"maxSize" mapstructure:"maxSize"`
+	// MaxBackups is the maximum number of old log files to retain.
+	// The default value is 1.
+	MaxBackups int `yaml:"maxBackups" mapstructure:"maxBackups"`
+	// MaxAge is the maximum number of days log files to retain.
+	// The default value is 7
+	MaxAge int `yaml:"maxAge" mapstructure:"maxAge"`
+	// Compress is the option of compress log data
+	Compress bool `yaml:"compress" mapstructure:"compress"`
+	// Structural is the option whether log using json-formatter or console-formatter
+	Structural bool `yaml:"structural" mapstructure:"structural"`
+}
+
+type LogConfigs struct {
+	Core       LogConfig `yaml:"core" mapstructure:"core"`
+	Grpc       LogConfig `yaml:"grpc" mapstructure:"grpc"`
+	GC         LogConfig `yaml:"gC" mapstructure:"gc"`
+	StorageGc  LogConfig `yaml:"storageGc" mapstructure:"storageGc"`
+	Job        LogConfig `yaml:"job" mapstructure:"job"`
+	Sql        LogConfig `yaml:"sql" mapstructure:"sql"`
+	StatSeed   LogConfig `yaml:"statSeed" mapstructure:"statSeed"`
+	Downloader LogConfig `yaml:"downloader" mapstructure:"downloader"`
+	KeepAlive  LogConfig `yaml:"keepAlive" mapstructure:"keepAlive"`
+}
+
+func CreateLogger(filePath string, stats bool, verbose bool, cfg LogConfig) (*zap.Logger, zap.AtomicLevel, error) {
 	rotateConfig := &lumberjack.Logger{
 		Filename:   filePath,
-		MaxSize:    defaultRotateMaxSize,
-		MaxAge:     defaultRotateMaxAge,
-		MaxBackups: defaultRotateMaxBackups,
+		MaxSize:    cfg.MaxSize,
+		MaxAge:     cfg.MaxAge,
+		MaxBackups: cfg.MaxBackups,
 		LocalTime:  true,
-		Compress:   compress,
+		Compress:   cfg.Compress,
 	}
 	syncer := zapcore.AddSync(rotateConfig)
 
@@ -75,8 +111,14 @@ func CreateLogger(filePath string, compress bool, stats bool, verbose bool) (*za
 		level = coreLevel
 	}
 
+	var encoder zapcore.Encoder
+	if cfg.Structural {
+		encoder = zapcore.NewJSONEncoder(encoderConfig)
+	} else {
+		encoder = zapcore.NewConsoleEncoder(encoderConfig)
+	}
 	core := zapcore.NewCore(
-		zapcore.NewJSONEncoder(encoderConfig),
+		encoder,
 		syncer,
 		level,
 	)
@@ -87,6 +129,57 @@ func CreateLogger(filePath string, compress bool, stats bool, verbose bool) (*za
 	}
 
 	return zap.New(core, opts...), level, nil
+}
+
+func NewDefaultConfigs() *LogConfigs {
+	return &LogConfigs{
+		Core:       DefaultLogConfig,
+		Grpc:       DefaultLogConfig,
+		GC:         DefaultLogConfig,
+		StorageGc:  DefaultLogConfig,
+		Job:        DefaultLogConfig,
+		Sql:        DefaultLogConfig,
+		StatSeed:   DefaultLogConfig,
+		Downloader: DefaultLogConfig,
+		KeepAlive:  DefaultLogConfig,
+	}
+}
+
+type Option func(o *LogConfig) error
+
+func WithMaxSize(maxSize int) Option {
+	return func(o *LogConfig) error {
+		o.MaxSize = maxSize
+		return nil
+	}
+}
+
+func WithMaxBackups(maxBackups int) Option {
+	return func(o *LogConfig) error {
+		o.MaxBackups = maxBackups
+		return nil
+	}
+}
+
+func WithMaxAge(maxAge int) Option {
+	return func(o *LogConfig) error {
+		o.MaxAge = maxAge
+		return nil
+	}
+}
+
+func WithCompress(compress bool) Option {
+	return func(o *LogConfig) error {
+		o.Compress = compress
+		return nil
+	}
+}
+
+func WithStructural(structural bool) Option {
+	return func(o *LogConfig) error {
+		o.Structural = structural
+		return nil
+	}
 }
 
 func SetCoreLevel(level zapcore.Level) {

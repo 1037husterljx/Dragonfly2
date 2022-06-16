@@ -46,7 +46,6 @@ func newMyqsl(cfg *config.Config) (*gorm.DB, error) {
 
 	// configure sql log
 	log := zapgorm2.New(logger.SqlLogger)
-	log.SetAsDefault()
 	var gormLog gormLogger.Interface
 	if cfg.Verbose {
 		gormLog = log.LogMode(gormLogger.Info)

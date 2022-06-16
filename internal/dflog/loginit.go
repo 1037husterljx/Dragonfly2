@@ -27,9 +27,10 @@ type logInitMeta struct {
 	fileName             string
 	setSugaredLoggerFunc func(*zap.SugaredLogger)
 	setLoggerFunc        func(log *zap.Logger)
+	logConfig            LogConfig
 }
 
-func InitManager(verbose, console bool, dir string) error {
+func InitManager(verbose, console bool, dir string, cfg *LogConfigs) error {
 	if console {
 		return createConsoleLogger(verbose)
 	}
@@ -40,29 +41,34 @@ func InitManager(verbose, console bool, dir string) error {
 		{
 			fileName:             CoreLogFileName,
 			setSugaredLoggerFunc: SetCoreLogger,
+			logConfig:            cfg.Core,
 		},
 		{
 			fileName:             GrpcLogFileName,
 			setSugaredLoggerFunc: SetGrpcLogger,
+			logConfig:            cfg.Grpc,
 		},
 		{
 			fileName:             GCLogFileName,
 			setSugaredLoggerFunc: SetGCLogger,
+			logConfig:            cfg.GC,
 		},
 		{
 			fileName:             JobLogFileName,
 			setSugaredLoggerFunc: SetJobLogger,
+			logConfig:            cfg.Job,
 		},
 		{
 			fileName:      SqlLogFileName,
 			setLoggerFunc: SetSqlLogger,
+			logConfig:     cfg.Sql,
 		},
 	}
 
 	return createFileLogger(verbose, meta, logDir)
 }
 
-func InitScheduler(verbose, console bool, dir string) error {
+func InitScheduler(verbose, console bool, dir string, cfg *LogConfigs) error {
 	if console {
 		return createConsoleLogger(verbose)
 	}
@@ -73,18 +79,22 @@ func InitScheduler(verbose, console bool, dir string) error {
 		{
 			fileName:             CoreLogFileName,
 			setSugaredLoggerFunc: SetCoreLogger,
+			logConfig:            cfg.Core,
 		},
 		{
 			fileName:             GrpcLogFileName,
 			setSugaredLoggerFunc: SetGrpcLogger,
+			logConfig:            cfg.Grpc,
 		},
 		{
 			fileName:             GCLogFileName,
 			setSugaredLoggerFunc: SetGCLogger,
+			logConfig:            cfg.GC,
 		},
 		{
 			fileName:             JobLogFileName,
 			setSugaredLoggerFunc: SetJobLogger,
+			logConfig:            cfg.Job,
 		},
 	}
 
@@ -134,7 +144,7 @@ func InitCdnSystem(verbose, console bool, dir string) error {
 	return createFileLogger(verbose, meta, logDir)
 }
 
-func InitDaemon(verbose, console bool, dir string) error {
+func InitDaemon(verbose, console bool, dir string, cfg *LogConfigs) error {
 	if console {
 		return createConsoleLogger(verbose)
 	}
@@ -145,14 +155,17 @@ func InitDaemon(verbose, console bool, dir string) error {
 		{
 			fileName:             CoreLogFileName,
 			setSugaredLoggerFunc: SetCoreLogger,
+			logConfig:            cfg.Core,
 		},
 		{
 			fileName:             GrpcLogFileName,
 			setSugaredLoggerFunc: SetGrpcLogger,
+			logConfig:            cfg.Grpc,
 		},
 		{
 			fileName:             GCLogFileName,
 			setSugaredLoggerFunc: SetGCLogger,
+			logConfig:            cfg.GC,
 		},
 	}
 
@@ -208,7 +221,7 @@ func createFileLogger(verbose bool, meta []logInitMeta, logDir string) error {
 	levels = nil
 
 	for _, m := range meta {
-		log, level, err := CreateLogger(path.Join(logDir, m.fileName), false, false, verbose)
+		log, level, err := CreateLogger(path.Join(logDir, m.fileName), false, verbose, m.logConfig)
 		if err != nil {
 			return err
 		}

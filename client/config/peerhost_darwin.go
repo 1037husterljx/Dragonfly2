@@ -20,6 +20,7 @@
 package config
 
 import (
+	logger "d7y.io/dragonfly/v2/internal/dflog"
 	"net"
 	"time"
 
@@ -36,6 +37,7 @@ var peerHostConfig = DaemonOption{
 	AliveTime:   clientutil.Duration{Duration: DefaultDaemonAliveTime},
 	GCInterval:  clientutil.Duration{Duration: DefaultGCInterval},
 	KeepStorage: false,
+	Log:         logger.NewDefaultConfigs(),
 	Scheduler: SchedulerOption{
 		Manager: ManagerOption{
 			Enable:          false,

@@ -57,6 +57,8 @@ type DaemonOption struct {
 	DataDir     string `mapstructure:"dataDir" yaml:"dataDir"`
 	KeepStorage bool   `mapstructure:"keepStorage" yaml:"keepStorage"`
 
+	// Log configuration
+	Log           *logger.LogConfigs  `yaml:"log" mapstructure:"log"`
 	Scheduler     SchedulerOption     `mapstructure:"scheduler" yaml:"scheduler"`
 	Host          HostOption          `mapstructure:"host" yaml:"host"`
 	Download      DownloadOption      `mapstructure:"download" yaml:"download"`

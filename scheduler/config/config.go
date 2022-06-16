@@ -17,6 +17,7 @@
 package config
 
 import (
+	logger "d7y.io/dragonfly/v2/internal/dflog"
 	"time"
 
 	"github.com/pkg/errors"
@@ -36,6 +37,9 @@ type Config struct {
 
 	// Server configuration.
 	Server *ServerConfig `yaml:"server" mapstructure:"server"`
+
+	// Log configuration
+	Log *logger.LogConfigs `yaml:"log" mapstructure:"log"`
 
 	// Dynconfig configuration.
 	DynConfig *DynConfig `yaml:"dynConfig" mapstructure:"dynConfig"`
@@ -68,6 +72,7 @@ func New() *Config {
 			Listen: "0.0.0.0",
 			Port:   8002,
 		},
+		Log: logger.NewDefaultConfigs(),
 		Scheduler: &SchedulerConfig{
 			Algorithm:            "default",
 			BackSourceCount:      3,

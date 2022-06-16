@@ -52,7 +52,7 @@ for managing schedulers and seed peers, offering http apis and portal, etc.`,
 		}
 
 		// Initialize logger
-		if err := logger.InitManager(cfg.Verbose, cfg.Console, d.LogDir()); err != nil {
+		if err := logger.InitManager(cfg.Verbose, cfg.Console, d.LogDir(), cfg.Log); err != nil {
 			return errors.Wrap(err, "init manager logger")
 		}
 

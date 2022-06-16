@@ -18,6 +18,7 @@ package config
 
 import (
 	"crypto/tls"
+	logger "d7y.io/dragonfly/v2/internal/dflog"
 	"errors"
 	"time"
 
@@ -33,6 +34,9 @@ type Config struct {
 
 	// Server configuration
 	Server *ServerConfig `yaml:"server" mapstructure:"server"`
+
+	// Log configuration
+	Log *logger.LogConfigs `yaml:"log" mapstructure:"log"`
 
 	// Database configuration
 	Database *DatabaseConfig `yaml:"database" mapstructure:"database"`
@@ -226,6 +230,7 @@ func New() *Config {
 				Addr: ":8080",
 			},
 		},
+		Log: logger.NewDefaultConfigs(),
 		Database: &DatabaseConfig{
 			Redis: &RedisConfig{
 				CacheDB:   0,
