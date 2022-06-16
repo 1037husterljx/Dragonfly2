@@ -100,9 +100,6 @@ type ClientOption struct {
 	// LogDir is log directory of dfget.
 	LogDir string `yaml:"logDir,omitempty" mapstructure:"logDir,omitempty"`
 
-	// WorkHome is working directory of dfget.
-	WorkHome string `yaml:"workHome,omitempty" mapstructure:"workHome,omitempty"`
-
 	RateLimit clientutil.RateLimit `yaml:"rateLimit,omitempty" mapstructure:"rateLimit,omitempty"`
 
 	// Config file paths,

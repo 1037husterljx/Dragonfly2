@@ -163,8 +163,6 @@ func init() {
 
 	flagSet.String("callsystem", dfgetConfig.CallSystem, "The caller name which is mainly used for statistics and access control")
 
-	flagSet.String("workhome", dfgetConfig.WorkHome, "Dfget working directory")
-
 	flagSet.String("logdir", dfgetConfig.LogDir, "Dfget log directory")
 
 	flagSet.BoolP("recursive", "r", dfgetConfig.Recursive,

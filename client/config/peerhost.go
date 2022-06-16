@@ -52,7 +52,6 @@ type DaemonOption struct {
 	GCInterval clientutil.Duration `mapstructure:"gcInterval" yaml:"gcInterval"`
 	Metrics    string              `yaml:"metrics" mapstructure:"metrics"`
 
-	WorkHome    string `mapstructure:"workHome" yaml:"workHome"`
 	CacheDir    string `mapstructure:"cacheDir" yaml:"cacheDir"`
 	LogDir      string `mapstructure:"logDir" yaml:"logDir"`
 	DataDir     string `mapstructure:"dataDir" yaml:"dataDir"`

@@ -83,7 +83,6 @@ func init() {
 	flags.StringP("tag", "t", "", "different tags for the same cid will be recognized as different  files in P2P network")
 	flags.Duration("timeout", dfcacheConfig.Timeout, "Timeout for this cache operation, 0 is infinite")
 	flags.String("callsystem", dfcacheConfig.CallSystem, "The caller name which is mainly used for statistics and access control")
-	flags.String("workhome", dfcacheConfig.WorkHome, "Dfcache working directory")
 	flags.String("logdir", dfcacheConfig.LogDir, "Dfcache log directory")
 
 	// Bind common flags

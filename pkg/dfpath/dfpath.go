@@ -63,6 +63,9 @@ type Option func(d *dfpath)
 func WithWorkHome(dir string) Option {
 	return func(d *dfpath) {
 		d.workHome = dir
+		d.cacheDir = filepath.Join(d.workHome, "cache")
+		d.logDir = filepath.Join(d.workHome, "logs")
+		d.dataDir = filepath.Join(d.workHome, "data")
 	}
 }
 

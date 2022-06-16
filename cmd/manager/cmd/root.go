@@ -46,7 +46,7 @@ for managing schedulers and seed peers, offering http apis and portal, etc.`,
 	SilenceUsage:      true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Initialize dfpath
-		d, err := initDfpath(cfg.Server)
+		d, err := initDfpath(cfg)
 		if err != nil {
 			return err
 		}
@@ -82,10 +82,13 @@ func init() {
 	dependency.InitCobra(rootCmd, true, cfg)
 }
 
-func initDfpath(cfg *config.ServerConfig) (dfpath.Dfpath, error) {
+func initDfpath(cfg *config.Config) (dfpath.Dfpath, error) {
 	var options []dfpath.Option
-	if cfg.LogDir != "" {
-		options = append(options, dfpath.WithLogDir(cfg.LogDir))
+	if cfg.WorkHome != "" {
+		options = append(options, dfpath.WithWorkHome(cfg.WorkHome))
+	}
+	if cfg.Server.LogDir != "" {
+		options = append(options, dfpath.WithLogDir(cfg.Server.LogDir))
 	}
 
 	return dfpath.New(options...)

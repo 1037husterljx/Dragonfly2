@@ -21,6 +21,7 @@ type Options struct {
 	Verbose   bool            `yaml:"verbose" mapstructure:"verbose"`
 	PProfPort int             `yaml:"pprof-port" mapstructure:"pprof-port"`
 	Telemetry TelemetryOption `yaml:",inline" mapstructure:",squash"`
+	WorkHome  string          `yaml:"workHome,omitempty" mapstructure:"workHome,omitempty"`
 }
 
 // TelemetryOption is the option for telemetry

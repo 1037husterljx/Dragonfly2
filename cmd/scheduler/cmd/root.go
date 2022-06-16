@@ -50,7 +50,7 @@ generate and maintain a P2P network during the download process, and push suitab
 		defer cancel()
 
 		// Initialize dfpath
-		d, err := initDfpath(cfg.Server)
+		d, err := initDfpath(cfg)
 		if err != nil {
 			return err
 		}
@@ -85,14 +85,17 @@ func init() {
 	dependency.InitCobra(rootCmd, true, cfg)
 }
 
-func initDfpath(cfg *config.ServerConfig) (dfpath.Dfpath, error) {
+func initDfpath(cfg *config.Config) (dfpath.Dfpath, error) {
 	var options []dfpath.Option
-	if cfg.LogDir != "" {
-		options = append(options, dfpath.WithLogDir(cfg.LogDir))
+	if cfg.WorkHome != "" {
+		options = append(options, dfpath.WithWorkHome(cfg.WorkHome))
+	}
+	if cfg.Server.LogDir != "" {
+		options = append(options, dfpath.WithLogDir(cfg.Server.LogDir))
 	}
 
-	if cfg.CacheDir != "" {
-		options = append(options, dfpath.WithCacheDir(cfg.CacheDir))
+	if cfg.Server.CacheDir != "" {
+		options = append(options, dfpath.WithCacheDir(cfg.Server.CacheDir))
 	}
 
 	return dfpath.New(options...)

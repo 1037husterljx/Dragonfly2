@@ -69,7 +69,7 @@ func InitCobra(cmd *cobra.Command, useConfigFile bool, config interface{}) {
 		flags.String("jaeger", "", "jaeger endpoint url, like: http://localhost:14250/api/traces")
 		flags.String("service-name", fmt.Sprintf("%s-%s", "dragonfly", cmd.Name()), "name of the service for tracer")
 		flags.String("config", "", fmt.Sprintf("the path of configuration file with yaml extension name, default is %s, it can also be set by env var: %s", filepath.Join(dfpath.DefaultConfigDir, rootName+".yaml"), strings.ToUpper(rootName+"_config")))
-
+		flags.String("workhome", dfpath.DefaultWorkHome, "system files(log, data, cache, sock, etc.) are stored in workhome directory")
 		// Bind common flags
 		if err := viper.BindPFlags(flags); err != nil {
 			panic(errors.Wrap(err, "bind common flags to viper"))
