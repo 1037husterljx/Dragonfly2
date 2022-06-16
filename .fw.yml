@@ -1,20 +1,21 @@
 version: 1.0
-name: dragonfly-manager
+name: dragonfly2
 dependencies:
   base:
     go: 1.17.3
 variables:
   IMAGE_TAG: 2.0-{{FW_BUILD_NUMBER}}-{{FW_BUILD_TIME}}
   GOPROXY: https://goproxy.cn
+  MODULE: manager
 machine:
   standard:
     7u2_docker_313:
       - default
 scripts:
-  - D7Y_VERSION={{IMAGE_TAG}} ./hack/aone-build.sh manager
+  - D7Y_VERSION={{IMAGE_TAG}} ./hack/aone-build.sh {{MODULE}}
 artifacts:
   images:
-    - reg.docker.alibaba-inc.com/dragonfly2/manager:{{IMAGE_TAG}}
+    - reg.docker.alibaba-inc.com/dragonfly2/{{MODULE}}:{{IMAGE_TAG}}
 notifications:
   email:
     - cuidajun.cdj@alibaba-inc.com

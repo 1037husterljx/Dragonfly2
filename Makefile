@@ -126,19 +126,19 @@ docker-push-manager: docker-build-manager
 # Push dfdaemon image
 aone-push-dfdaemon:
 	@echo "Begin to push dfdaemon docker image."
-	./hack/aone-push.sh dfdaemon
+	D7Y_VERSION=$(GIT_COMMIT) ./hack/aone-push.sh dfdaemon
 .PHONY: aone-push-dfdaemon
 
 # Push scheduler image
 aone-push-scheduler:
 	@echo "Begin to push scheduler docker image."
-	./hack/aone-push.sh scheduler
+	D7Y_VERSION=$(GIT_COMMIT) ./hack/aone-push.sh scheduler
 .PHONY: aone-push-scheduler
 
 # Push manager image
 aone-push-manager:
 	@echo "Begin to push manager docker image."
-	./hack/aone-push.sh manager
+	D7Y_VERSION=$(GIT_COMMIT) ./hack/aone-push.sh manager
 .PHONY: aone-push-manager
 
 # Build dragonfly

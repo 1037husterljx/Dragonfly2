@@ -38,7 +38,7 @@ var (
 )
 
 const (
-	defaultRotateMaxSize    = 100
+	defaultRotateMaxSize    = 200
 	defaultRotateMaxBackups = 10
 	defaultRotateMaxAge     = 7
 )
@@ -50,7 +50,7 @@ const (
 var DefaultLogConfig = LogConfig{
 	MaxSize:    defaultRotateMaxSize,
 	MaxBackups: defaultRotateMaxBackups,
-	MaxAge:     defaultRotateMaxBackups,
+	MaxAge:     defaultRotateMaxAge,
 	Compress:   false,
 	Structural: true,
 }
