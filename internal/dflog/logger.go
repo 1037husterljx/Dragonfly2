@@ -50,7 +50,7 @@ func init() {
 		SetGCLogger(sugar)
 		SetStorageGCLogger(sugar)
 		SetKeepAliveLogger(sugar)
-		SetSlowSqlLogger(log)
+		SetSqlLogger(log)
 		SetStatSeedLogger(log)
 		SetDownloadLogger(log)
 		SetJobLogger(sugar)
@@ -83,8 +83,8 @@ func SetKeepAliveLogger(log *zap.SugaredLogger) {
 	KeepAliveLogger = log
 }
 
-func SetSlowSqlLogger(log *zap.Logger) {
-	SlowSqlLogger = log
+func SetSqlLogger(log *zap.Logger) {
+	SqlLogger = log
 }
 
 func SetStatSeedLogger(log *zap.Logger) {
