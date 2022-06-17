@@ -86,3 +86,8 @@ const (
 	CmdExport = "export"
 	CmdDelete = "delete"
 )
+
+const (
+	ManagerSelectStrategyManagerReady   = "managerReady"
+	ManagerSelectStrategySchedulerReady = "schedulerReady"
+)

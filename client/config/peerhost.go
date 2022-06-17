@@ -125,6 +125,10 @@ func (p *DaemonOption) Validate() error {
 		if p.Scheduler.Manager.RefreshInterval == 0 {
 			return errors.New("manager refreshInterval is not specified")
 		}
+
+		if !(p.Scheduler.Manager.SelectStrategy == ManagerSelectStrategyManagerReady || p.Scheduler.Manager.SelectStrategy == ManagerSelectStrategySchedulerReady) {
+			return errors.New("wrong SelectStrategy config")
+		}
 		return nil
 	}
 
@@ -189,6 +193,8 @@ type ManagerOption struct {
 	RefreshInterval time.Duration `mapstructure:"refreshInterval" yaml:"refreshInterval"`
 	// SeedPeer configuration.
 	SeedPeer SeedPeerOption `mapstructure:"seedPeer" yaml:"seedPeer"`
+	// healthCheckMethod configration
+	SelectStrategy string `mapstructure:"selectStrategy" yaml:"selectStrategy"`
 }
 
 type SeedPeerOption struct {

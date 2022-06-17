@@ -48,6 +48,7 @@ import (
 	"d7y.io/dragonfly/v2/client/daemon/storage"
 	"d7y.io/dragonfly/v2/client/daemon/upload"
 	logger "d7y.io/dragonfly/v2/internal/dflog"
+	"d7y.io/dragonfly/v2/manager/searcher"
 	"d7y.io/dragonfly/v2/pkg/dfnet"
 	"d7y.io/dragonfly/v2/pkg/dfpath"
 	"d7y.io/dragonfly/v2/pkg/idgen"
@@ -123,7 +124,7 @@ func New(opt *config.DaemonOption, d dfpath.Dfpath) (Daemon, error) {
 	if opt.Scheduler.Manager.Enable {
 		// New manager client
 		var err error
-		managerClient, err = managerclient.NewWithAddrs(opt.Scheduler.Manager.NetAddrs)
+		managerClient, err = NewManagerWithAddrs(opt.Scheduler.Manager.NetAddrs, opt.Scheduler.Manager.SelectStrategy, opt.Host)
 		if err != nil {
 			return nil, err
 		}
@@ -682,6 +683,61 @@ func getSchedulerIPs(schedulers []*manager.Scheduler) []string {
 	}
 
 	return ips
+}
+
+// NewManagerWithAddrs NewWithAddrs creates manager client with addresses.
+func NewManagerWithAddrs(netAddrs []dfnet.NetAddr, SelectStrategy string, hostOption config.HostOption) (managerclient.Client, error) {
+	for _, netAddr := range netAddrs {
+		reachable := reachable.New(&reachable.Config{Address: netAddr.Addr})
+		if err := reachable.Check(); err == nil {
+			if SelectStrategy == config.ManagerSelectStrategyManagerReady {
+				logger.Infof("use %s address for manager grpc client", netAddr.Addr)
+				return managerclient.New(netAddr.Addr)
+			} else if SelectStrategy == config.ManagerSelectStrategySchedulerReady {
+				managerClient, err := managerclient.New(netAddr.Addr)
+				if err != nil {
+					logger.Infof("manager%s cannot reach because:%s", netAddr.Addr, err.Error())
+					continue
+				}
+				if managerClient, err := getManagerWithValidSchedulers(managerClient, hostOption); err == nil {
+					logger.Infof("use %s address for manager grpc client", netAddr.Addr)
+					return managerClient, nil
+				}
+			} else {
+				return nil, errors.New("wrong SelectStrategy config")
+			}
+		}
+
+		logger.Warnf("%s manager address can not reachable", netAddr.Addr)
+	}
+
+	return nil, errors.New("can not find available manager addresses")
+}
+
+// getManagerWithValidSchedulers check listSchedulersResp.Schedulers valid
+func getManagerWithValidSchedulers(managerClient managerclient.Client, hostOption config.HostOption) (managerclient.Client, error) {
+
+	listSchedulersResp, err := managerClient.ListSchedulers(&manager.ListSchedulersRequest{
+		SourceType: manager.SourceType_PEER_SOURCE,
+		HostName:   hostOption.Hostname,
+		Ip:         hostOption.AdvertiseIP,
+		HostInfo: map[string]string{
+			searcher.ConditionSN:             hostOption.SN,
+			searcher.ConditionSecurityDomain: hostOption.SecurityDomain,
+			searcher.ConditionIDC:            hostOption.IDC,
+			searcher.ConditionNetTopology:    hostOption.NetTopology,
+			searcher.ConditionLocation:       hostOption.Location,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(schedulersToAvailableNetAddrs(listSchedulersResp.Schedulers)) == 0 {
+		managerClient.Close()
+		return nil, errors.New("manager return none valid schedulers")
+	}
+	return managerClient, nil
 }
 
 // schedulersToAvailableNetAddrs coverts []*manager.Scheduler to available []dfnet.NetAddr.
