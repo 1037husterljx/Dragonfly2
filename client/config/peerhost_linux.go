@@ -26,6 +26,7 @@ import (
 	"golang.org/x/time/rate"
 
 	"d7y.io/dragonfly/v2/client/clientutil"
+	logger "d7y.io/dragonfly/v2/internal/dflog"
 	"d7y.io/dragonfly/v2/manager/model"
 	"d7y.io/dragonfly/v2/pkg/dfnet"
 	"d7y.io/dragonfly/v2/pkg/util/hostutils"
@@ -36,6 +37,7 @@ var peerHostConfig = DaemonOption{
 	AliveTime:   clientutil.Duration{Duration: DefaultDaemonAliveTime},
 	GCInterval:  clientutil.Duration{Duration: DefaultGCInterval},
 	KeepStorage: false,
+	Log:         logger.NewDefaultConfigs(),
 	Scheduler: SchedulerOption{
 		Manager: ManagerOption{
 			Enable:          false,

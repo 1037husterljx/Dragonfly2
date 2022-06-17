@@ -22,5 +22,8 @@ package dfpath
 var DefaultWorkHome = "/usr/local/dragonfly"
 var DefaultCacheDir = "/var/cache/dragonfly"
 var DefaultConfigDir = "/etc/dragonfly"
+
+// DefaultAliConfigDir ali内部SA插件形式部署
+var DefaultAliConfigDir = "/home/staragent/plugins/dragonfly2-yace/config"
 var DefaultLogDir = "/var/log/dragonfly"
 var DefaultDataDir = "/var/lib/dragonfly"

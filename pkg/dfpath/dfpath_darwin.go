@@ -28,5 +28,8 @@ import (
 var DefaultWorkHome = filepath.Join(basic.HomeDir, ".dragonfly")
 var DefaultCacheDir = filepath.Join(DefaultWorkHome, "cache")
 var DefaultConfigDir = filepath.Join(DefaultWorkHome, "config")
+
+// DefaultAliConfigDir ali内部SA插件形式部署
+var DefaultAliConfigDir = filepath.Join(DefaultWorkHome, "config")
 var DefaultLogDir = filepath.Join(DefaultWorkHome, "logs")
 var DefaultDataDir = filepath.Join(DefaultWorkHome, "data")

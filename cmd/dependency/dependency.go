@@ -165,6 +165,7 @@ func initConfig(useConfigFile bool, name string, config interface{}) {
 			viper.SetConfigFile(cfgFile)
 		} else {
 			viper.AddConfigPath(dfpath.DefaultConfigDir)
+			viper.AddConfigPath(dfpath.DefaultAliConfigDir)
 			viper.SetConfigName(name)
 			viper.SetConfigType("yaml")
 		}
@@ -181,6 +182,7 @@ func initConfig(useConfigFile bool, name string, config interface{}) {
 				panic(errors.Wrap(err, "viper read config"))
 			}
 		}
+		fmt.Printf("use config file: %s", viper.ConfigFileUsed())
 	}
 	if err := viper.Unmarshal(config, initDecoderConfig); err != nil {
 		panic(errors.Wrap(err, "unmarshal config to struct"))

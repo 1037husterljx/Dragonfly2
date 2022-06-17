@@ -193,6 +193,7 @@ func runDaemon(d dfpath.Dfpath) error {
 
 	// daemon config values
 	s, _ := yaml.Marshal(cfg)
+	logger.Infof("client daemon configuration file location:%s", viper.ConfigFileUsed())
 	logger.Infof("client daemon configuration:\n%s", string(s))
 
 	ff := dependency.InitMonitor(cfg.PProfPort, cfg.Telemetry)

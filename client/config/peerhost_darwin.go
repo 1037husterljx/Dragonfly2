@@ -20,13 +20,13 @@
 package config
 
 import (
-	logger "d7y.io/dragonfly/v2/internal/dflog"
 	"net"
 	"time"
 
 	"golang.org/x/time/rate"
 
 	"d7y.io/dragonfly/v2/client/clientutil"
+	logger "d7y.io/dragonfly/v2/internal/dflog"
 	"d7y.io/dragonfly/v2/manager/model"
 	"d7y.io/dragonfly/v2/pkg/dfnet"
 	"d7y.io/dragonfly/v2/pkg/util/hostutils"
