@@ -17,6 +17,7 @@ DFGET_NAME := "dfget"
 DFCACHE_NAME := "dfcache"
 SEMVER := "2.0.3"
 VERSION_RELEASE := "1"
+DATE=$(shell date -u '+%Y%m%d')
 PKG := "$(PROJECT_NAME)"
 PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/ | grep -v '\(/test/\)')
 GIT_COMMIT := $(shell git rev-parse --verify HEAD --short=7)
@@ -78,19 +79,19 @@ docker-build-manager:
 # Build aone manager image
 aone-build-manager:
 	@echo "Begin to use docker build manager image."
-	D7Y_VERSION=$(GIT_COMMIT) ./hack/aone-build.sh manager
+	D7Y_VERSION=$(DATE)_$(GIT_COMMIT) ./hack/aone-build.sh manager
 .PHONY: aone-build-manager
 
 # Build aone manager image
 aone-build-scheduler:
 	@echo "Begin to use docker build manager image."
-	D7Y_VERSION=$(GIT_COMMIT) ./hack/aone-build.sh scheduler
+	D7Y_VERSION=$(DATE)_$(GIT_COMMIT) ./hack/aone-build.sh scheduler
 .PHONY: aone-build-scheduler
 
 # Build aone manager image
 aone-build-dfdaemon:
 	@echo "Begin to use docker build manager image."
-	D7Y_VERSION=$(GIT_COMMIT) ./hack/aone-build.sh dfdaemon
+	D7Y_VERSION=$(DATE)_$(GIT_COMMIT) ./hack/aone-build.sh dfdaemon
 .PHONY: aone-build-dfdaemon
 
 # Build testing tools image
@@ -126,19 +127,19 @@ docker-push-manager: docker-build-manager
 # Push dfdaemon image
 aone-push-dfdaemon:
 	@echo "Begin to push dfdaemon docker image."
-	D7Y_VERSION=$(GIT_COMMIT) ./hack/aone-push.sh dfdaemon
+	D7Y_VERSION=$(DATE)_$(GIT_COMMIT) ./hack/aone-push.sh dfdaemon
 .PHONY: aone-push-dfdaemon
 
 # Push scheduler image
 aone-push-scheduler:
 	@echo "Begin to push scheduler docker image."
-	D7Y_VERSION=$(GIT_COMMIT) ./hack/aone-push.sh scheduler
+	D7Y_VERSION=$(DATE)_$(GIT_COMMIT) ./hack/aone-push.sh scheduler
 .PHONY: aone-push-scheduler
 
 # Push manager image
 aone-push-manager:
 	@echo "Begin to push manager docker image."
-	D7Y_VERSION=$(GIT_COMMIT) ./hack/aone-push.sh manager
+	D7Y_VERSION=$(DATE)_$(GIT_COMMIT) ./hack/aone-push.sh manager
 .PHONY: aone-push-manager
 
 # Build dragonfly

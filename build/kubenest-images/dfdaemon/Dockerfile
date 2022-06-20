@@ -23,7 +23,7 @@ ENV DFGET_CONFIG /home/admin/$APPNAME/config/seedpeer.yaml
 
 WORKDIR /home/admin/
 RUN echo "ps -eo pid,command|grep 'dragonfly2-seedpeer/target/dfget'|grep -v 'grep' | awk '{print \$1}'|xargs kill -2" > /home/admin/stop.sh && \
-    echo "/home/admin/dragonfly2-seedpeer/target/dfget daemon --config /home/admin/dragonfly2-seedpeer/config/seedpeer.yaml > /dev/null 2>&1 &" > /home/admin/start.sh && \
+    echo "/home/admin/dragonfly2-seedpeer/target/dfget daemon --config /home/admin/dragonfly2-seedpeer/config/seedpeer.yaml > /home/admin/dragonfly2-seedpeer/service.log 2>&1 &" > /home/admin/start.sh && \
     echo "/home/admin/dragonfly2-seedpeer/target/dfget --workhome /home/admin/dragonfly2-seedpeer \"\$@\"" > /home/admin/dfget && \
     chmod +x /home/admin/dfget
 RUN chown -R admin:admin /home/admin
