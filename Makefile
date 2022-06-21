@@ -33,12 +33,12 @@ build-dirs:
 .PHONY: build-dirs
 
 # Build dragonlfy
-docker-build: docker-build-cdn docker-build-dfdaemon docker-build-scheduler docker-build-manager
+docker-build: docker-build-dfdaemon docker-build-scheduler docker-build-manager
 	@echo "Build image done."
 .PHONY: docker-build
 
 # Push dragonfly images
-docker-push: docker-push-cdn docker-push-dfdaemon docker-push-scheduler docker-push-manager
+docker-push: docker-push-dfdaemon docker-push-scheduler docker-push-manager
 	@echo "Push image done."
 .PHONY: docker-push
 
@@ -100,12 +100,6 @@ docker-build-testing-tools: build-dirs
 	./test/tools/no-content-length/build.sh
 .PHONY: docker-build-testing-tools
 
-# Push cdn image
-docker-push-cdn: docker-build-cdn
-	@echo "Begin to push cdn docker image."
-	./hack/docker-push.sh cdn
-.PHONY: docker-push-cdn
-
 # Push dfdaemon image
 docker-push-dfdaemon: docker-build-dfdaemon
 	@echo "Begin to push dfdaemon docker image."
@@ -143,14 +137,8 @@ aone-push-manager:
 .PHONY: aone-push-manager
 
 # Build dragonfly
-build: build-cdn build-scheduler build-dfget build-dfcache build-manager
+build: build-scheduler build-dfget build-dfcache build-manager
 .PHONY: build
-
-# Build cdn
-build-cdn: build-dirs
-	@echo "Begin to build cdn."
-	./hack/build.sh cdn
-.PHONY: build-cdn
 
 # Build dfget
 build-dfget: build-dirs
@@ -193,12 +181,6 @@ build-manager-console: build-dirs
 	@echo "Begin to build manager."
 	./hack/build.sh manager-console
 .PHONY: build-manager-console
-
-# Install cdn
-install-cdn:
-	@echo "Begin to install cdn."
-	./hack/install.sh install cdn
-.PHONY: install-cdn
 
 # Install dfget
 install-dfget:
@@ -353,14 +335,9 @@ clean-e2e-test:
 .PHONY: clean-e2e-test
 
 # Kind load dragonlfy
-kind-load: kind-load-cdn kind-load-scheduler kind-load-dfdaemon kind-load-manager kind-load-testing-tools
+kind-load: kind-load-scheduler kind-load-dfdaemon kind-load-manager kind-load-testing-tools
 	@echo "Kind load image done."
 .PHONY: kind-load
-
-# Run kind load docker-image cdn
-kind-load-cdn:
-	@./hack/kind-load.sh cdn
-.PHONY: kind-load-cdn
 
 # Run kind load docker scheduler
 kind-load-scheduler:
@@ -423,14 +400,11 @@ help:
 	@echo "make build-dirs                     prepare required folders for build"
 	@echo "make docker-build                   build dragonfly image"
 	@echo "make docker-push                    push dragonfly image"
-	@echo "make docker-build-cdn               build CDN image"
 	@echo "make docker-build-dfdaemon          build dfdaemon image"
 	@echo "make docker-build-scheduler         build scheduler image"
-	@echo "make docker-push-cdn                push CDN image"
 	@echo "make docker-push-dfdaemon           push dfdaemon image"
 	@echo "make docker-push-scheduler          push scheduler image"
 	@echo "make build                          build dragonfly"
-	@echo "make build-cdn                      build CDN"
 	@echo "make build-dfget                    build dfget"
 	@echo "make build-dfget-linux              build linux dfget"
 	@echo "make build-dfcache                  build dfcache"
@@ -439,7 +413,6 @@ help:
 	@echo "make build-manager                  build manager"
 	@echo "make build-manager-console          build manager console"
 	@echo "make build-e2e-sha256sum            build sha256sum test tool"
-	@echo "make install-cdn                    install CDN"
 	@echo "make install-dfget                  install dfget"
 	@echo "make install-scheduler              install scheduler"
 	@echo "make install-manager                install manager"
@@ -457,7 +430,6 @@ help:
 	@echo "make e2e-test-coverage              run e2e tests with coverage"
 	@echo "make clean-e2e-test                 clean e2e tests"
 	@echo "make kind-load                      kind load docker image"
-	@echo "make kind-load-cdn                  kind load cdn docker image"
 	@echo "make kind-load-scheduler            kind load scheduler docker image"
 	@echo "make kind-load-dfdaemon             kind load dfdaemon docker image"
 	@echo "make kind-load-manager              kind load manager docker image"
