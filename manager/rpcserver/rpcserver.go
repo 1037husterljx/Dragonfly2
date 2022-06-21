@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"time"
 
 	cachev8 "github.com/go-redis/cache/v8"
 	"github.com/go-redis/redis/v8"
@@ -28,6 +29,8 @@ import (
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/health"
@@ -35,6 +38,7 @@ import (
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 
+	"d7y.io/dragonfly/v2/internal/constants"
 	logger "d7y.io/dragonfly/v2/internal/dflog"
 	"d7y.io/dragonfly/v2/manager/cache"
 	"d7y.io/dragonfly/v2/manager/config"
@@ -110,7 +114,38 @@ func New(
 	// Register servers on grpc server.
 	manager.RegisterManagerServer(grpcServer, server)
 	healthpb.RegisterHealthServer(grpcServer, health.NewServer())
+
+	registerMetrics(database)
+
 	return grpcServer
+}
+
+func registerMetrics(database *database.Database) {
+	_ = promauto.NewGaugeFunc(prometheus.GaugeOpts{
+		Namespace: constants.MetricsNamespace,
+		Subsystem: constants.ManagerMetricsName,
+		Name:      "peer_total_short",
+		Help:      "Gauge of the number of peer within short time.",
+	}, func() float64 {
+		shortTLLCount, err := hllCount(cache.HyperLogLogShortTLL, database.RDB)
+		if err != nil {
+			logger.Errorf("redis pfcount err:%s", err.Error())
+		}
+		return float64(shortTLLCount)
+	})
+
+	_ = promauto.NewGaugeFunc(prometheus.GaugeOpts{
+		Namespace: constants.MetricsNamespace,
+		Subsystem: constants.ManagerMetricsName,
+		Name:      "peer_total_long",
+		Help:      "Gauge of the number of peer within long time.",
+	}, func() float64 {
+		longTLLCount, err := hllCount(cache.HyperLogLogLongTLL, database.RDB)
+		if err != nil {
+			logger.Errorf("redis pfcount err: %s", err.Error())
+		}
+		return float64(longTLLCount)
+	})
 }
 
 // Get SeedPeer and SeedPeer cluster configuration.
@@ -468,6 +503,11 @@ func (s *Server) ListSchedulers(ctx context.Context, req *manager.ListSchedulers
 		}
 	}
 
+	err := s.storePeerToHLL(ctx, req)
+	if err != nil {
+		log.Warnf("get peer count failed: %s", err.Error())
+	}
+
 	var pbListSchedulersResponse manager.ListSchedulersResponse
 
 	// Search optimal scheduler clusters.
@@ -542,6 +582,65 @@ func (s *Server) getPeerCount(ctx context.Context, req *manager.ListSchedulersRe
 	}
 
 	return len(val), nil
+}
+
+// Get the number of active peers
+// use redis hll  https://redis.uptrace.dev/guide/go-redis-hll.html
+func (s *Server) storePeerToHLL(ctx context.Context, req *manager.ListSchedulersRequest) error {
+	cacheKey := cache.MakePeerCacheKey(req.HostName, req.Ip)
+
+	t := time.Now()
+
+	hllKey := cache.MakeHLLCacheKey(t)
+	if err := s.makeHLLExpire(ctx, hllKey, cacheKey, cache.HyperLogLogLongTLL); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// makeHLLExpire make hllKey expire
+func (s *Server) makeHLLExpire(ctx context.Context, hllKey string, item string, expireTime time.Duration) error {
+	val, err := s.rdb.Exists(ctx, hllKey).Result()
+	if err != nil {
+		return err
+	}
+
+	// use redis hll for peer count
+	if err := s.rdb.PFAdd(ctx, hllKey, item).Err(); err != nil {
+		return err
+	}
+
+	// if already exists, no need to refresh expireTime
+	if val == 0 {
+		// when reach ExpireTime,total hll will expire
+		if err := s.rdb.Expire(ctx, hllKey, expireTime).Err(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// Count hll's key set size use pfcount, key will create when listSchedule->storePeer->makeHLLExpire
+func hllCount(countTime time.Duration, rdb *redis.Client) (int64, error) {
+	//used for pfcount
+	var keys []string
+	ctx := context.Background()
+	t := time.Now()
+
+	//Filter out the keys within expireTime into keys
+	for i := time.Duration(0); i < countTime/time.Minute; i++ {
+		tPre := t.Add(-(time.Minute * i))
+		keys = append(keys, cache.MakeHLLCacheKey(tPre))
+	}
+
+	val, err := rdb.PFCount(ctx, keys...).Result()
+	if err != nil {
+		return 0, err
+	}
+
+	return val, nil
 }
 
 // Get object storage configuration.

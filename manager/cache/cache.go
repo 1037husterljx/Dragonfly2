@@ -18,6 +18,7 @@ package cache
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/go-redis/cache/v8"
@@ -49,6 +50,12 @@ const (
 const (
 	// PeerCacheTTL is the ttl for peer cache.
 	PeerCacheTTL = 30 * time.Minute
+)
+
+const (
+	HyperLogLogNamespace = "PeerSet"
+	HyperLogLogShortTLL  = time.Minute * 30
+	HyperLogLogLongTLL   = time.Hour * 24
 )
 
 // Cache is cache client.
@@ -108,4 +115,9 @@ func MakeSchedulersCacheKey(hostname, ip string) string {
 // Make cache key for buckets.
 func MakeBucketsCacheKey(name string) string {
 	return MakeCacheKey(BucketsNamespace, name)
+}
+
+// MakeHLLCacheKey Make cache key for redis hll within expire time.
+func MakeHLLCacheKey(t time.Time) string {
+	return MakeCacheKey(HyperLogLogNamespace, fmt.Sprintf("%s-%s-%s", strconv.Itoa(int(t.Weekday())), strconv.Itoa(t.Hour()), strconv.Itoa(t.Minute())))
 }
