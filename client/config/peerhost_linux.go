@@ -63,6 +63,7 @@ var peerHostConfig = DaemonOption{
 		Hostname:       hostutils.Hostname,
 		ListenIP:       "0.0.0.0",
 		AdvertiseIP:    iputils.IPv4,
+		SN:             hostutils.SN,
 		SecurityDomain: "",
 		Location:       "",
 		IDC:            "",

@@ -215,6 +215,8 @@ type HostOption struct {
 	ListenIP string `mapstructure:"listenIP" yaml:"listenIP"`
 	// The ip report to scheduler, normal same with listen ip
 	AdvertiseIP string `mapstructure:"advertiseIP" yaml:"advertiseIP"`
+	// SN is used for manager to search device info in database
+	SN string `mapstructure:"SN" yaml:"SN"`
 }
 
 type DownloadOption struct {

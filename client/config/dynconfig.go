@@ -216,6 +216,7 @@ func (mc *managerClient) Get() (interface{}, error) {
 		HostName:   mc.hostOption.Hostname,
 		Ip:         mc.hostOption.AdvertiseIP,
 		HostInfo: map[string]string{
+			searcher.ConditionSN:             mc.hostOption.SN,
 			searcher.ConditionSecurityDomain: mc.hostOption.SecurityDomain,
 			searcher.ConditionIDC:            mc.hostOption.IDC,
 			searcher.ConditionNetTopology:    mc.hostOption.NetTopology,

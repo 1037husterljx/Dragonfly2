@@ -32,6 +32,8 @@ import (
 )
 
 const (
+	// Condision SN key
+	ConditionSN = "SN"
 	// Condition security domain key
 	ConditionSecurityDomain = "security_domain"
 
