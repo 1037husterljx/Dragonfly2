@@ -53,6 +53,7 @@ import (
 	"d7y.io/dragonfly/v2/pkg/idgen"
 	"d7y.io/dragonfly/v2/pkg/reachable"
 	"d7y.io/dragonfly/v2/pkg/rpc"
+	"d7y.io/dragonfly/v2/pkg/rpc/base"
 	"d7y.io/dragonfly/v2/pkg/rpc/manager"
 	managerclient "d7y.io/dragonfly/v2/pkg/rpc/manager/client"
 	"d7y.io/dragonfly/v2/pkg/rpc/scheduler"
@@ -116,7 +117,7 @@ func New(opt *config.DaemonOption, d dfpath.Dfpath) (Daemon, error) {
 		schedulers     []*manager.Scheduler
 		dynconfig      config.Dynconfig
 		managerClient  managerclient.Client
-		defaultPattern = config.ConvertPattern(opt.Download.DefaultPattern, scheduler.Pattern_P2P)
+		defaultPattern = config.ConvertPattern(opt.Download.DefaultPattern, base.Pattern_P2P)
 	)
 
 	if opt.Scheduler.Manager.Enable == true {
@@ -219,13 +220,13 @@ func New(opt *config.DaemonOption, d dfpath.Dfpath) (Daemon, error) {
 		return nil, err
 	}
 
-	uploadManager, err := upload.NewUploadManager(storageManager,
+	uploadManager, err := upload.NewUploadManager(opt, storageManager, d.LogDir(),
 		upload.WithLimiter(rate.NewLimiter(opt.Upload.RateLimit.Limit, int(opt.Upload.RateLimit.Limit))))
 	if err != nil {
 		return nil, err
 	}
 
-	objectStorage, err := objectstorage.New(opt, dynconfig, peerTaskManager, storageManager)
+	objectStorage, err := objectstorage.New(opt, dynconfig, peerTaskManager, storageManager, d.LogDir())
 	if err != nil {
 		return nil, err
 	}
