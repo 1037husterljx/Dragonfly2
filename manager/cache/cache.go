@@ -33,6 +33,9 @@ const (
 	// Peer prefix of cache key.
 	PeerNamespace = "peer"
 
+	// HostInfo prefix of cache key
+	HostInfoNamespace = "hostinfo"
+
 	// Scheduler prefix of cache key.
 	SchedulerNamespace = "scheduler"
 
