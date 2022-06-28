@@ -17,12 +17,11 @@
 package config
 
 import (
-	logger "d7y.io/dragonfly/v2/internal/dflog"
+	"errors"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"d7y.io/dragonfly/v2/cmd/dependency/base"
+	logger "d7y.io/dragonfly/v2/internal/dflog"
 	"d7y.io/dragonfly/v2/pkg/net/fqdn"
 	"d7y.io/dragonfly/v2/pkg/net/ip"
 	"d7y.io/dragonfly/v2/scheduler/storage"
