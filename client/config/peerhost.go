@@ -127,6 +127,7 @@ func (p *DaemonOption) Validate() error {
 		}
 		return nil
 	}
+
 	if len(p.Scheduler.NetAddrs) == 0 {
 		return errors.New("empty schedulers and config server is not specified")
 	}
@@ -137,6 +138,12 @@ func (p *DaemonOption) Validate() error {
 
 	if int64(p.Upload.RateLimit.Limit) < DefaultMinRate.ToNumber() {
 		return errors.Errorf("rate limit must be greater than %s", DefaultMinRate.String())
+	}
+
+	if p.ObjectStorage.Enable {
+		if p.ObjectStorage.MaxReplicas <= 0 {
+			return errors.New("max replicas must be greater than 0")
+		}
 	}
 
 	switch p.Download.DefaultPattern {
@@ -366,6 +373,15 @@ type UploadOption struct {
 }
 
 type ObjectStorageOption struct {
+	// Enable object storage.
+	Enable bool `mapstructure:"enable" yaml:"enable"`
+	// Filter is used to generate a unique Task ID by
+	// filtering unnecessary query params in the URL,
+	// it is separated by & character.
+	Filter string `mapstructure:"filter" yaml:"filter"`
+	// MaxReplicas is the maximum number of replicas of an object cache in seed peers.
+	MaxReplicas int `mapstructure:"maxReplicas" yaml:"maxReplicas"`
+	// ListenOption is object storage service listener.
 	ListenOption `yaml:",inline" mapstructure:",squash"`
 }
 

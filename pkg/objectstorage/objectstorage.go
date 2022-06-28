@@ -73,7 +73,7 @@ type ObjectStorage interface {
 	ListBucketMetadatas(ctx context.Context) ([]*BucketMetadata, error)
 
 	// GetObjectMetadata returns metadata of object.
-	GetObjectMetadata(ctx context.Context, bucketName, objectKey string) (*ObjectMetadata, error)
+	GetObjectMetadata(ctx context.Context, bucketName, objectKey string) (*ObjectMetadata, bool, error)
 
 	// GetOject returns data of object.
 	GetOject(ctx context.Context, bucketName, objectKey string) (io.ReadCloser, error)
@@ -86,6 +86,9 @@ type ObjectStorage interface {
 
 	// ListObjectMetadatas returns metadata of objects.
 	ListObjectMetadatas(ctx context.Context, bucketName, prefix, marker string, limit int64) ([]*ObjectMetadata, error)
+
+	// IsObjectExist returns whether the object exists.
+	IsObjectExist(ctx context.Context, bucketName, objectKey string) (bool, error)
 
 	// GetSignURL returns sign url of object.
 	GetSignURL(ctx context.Context, bucketName, objectKey string, method Method, expire time.Duration) (string, error)

@@ -122,6 +122,9 @@ var peerHostConfig = DaemonOption{
 		},
 	},
 	ObjectStorage: ObjectStorageOption{
+		Enable:      false,
+		Filter:      "Expires&Signature&ns",
+		MaxReplicas: 3,
 		ListenOption: ListenOption{
 			Security: SecurityOption{
 				Insecure:  true,
@@ -130,8 +133,8 @@ var peerHostConfig = DaemonOption{
 			TCPListen: &TCPListenOption{
 				Listen: net.IPv4zero.String(),
 				PortRange: TCPListenPortRange{
-					Start: 8081,
-					End:   8081,
+					Start: 65004,
+					End:   65535,
 				},
 			},
 		},
