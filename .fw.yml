@@ -15,7 +15,7 @@ scripts:
   - D7Y_VERSION={{IMAGE_TAG}} ./hack/aone-build.sh {{MODULE}}
 artifacts:
   images:
-    - reg.docker.alibaba-inc.com/dragonfly2/{{MODULE}}:{{IMAGE_TAG}}
+    - reg.docker.alibaba-inc.com/dragonfly2/{{MODULE}}:{{IMAGE_TAG}} | build/kubenest-images/manager/Dockerfile
 notifications:
   email:
     - cuidajun.cdj@alibaba-inc.com
