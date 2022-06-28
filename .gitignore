@@ -66,3 +66,4 @@ artifacts
 **.cover
 config/.*
 /tmp/
+/manager/database/playgroud_test.go
