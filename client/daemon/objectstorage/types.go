@@ -18,7 +18,7 @@ package objectstorage
 
 import "mime/multipart"
 
-type GetObjectParams struct {
+type ObjectParams struct {
 	ID        string `uri:"id" binding:"required"`
 	ObjectKey string `uri:"object_key" binding:"required"`
 }
@@ -28,6 +28,13 @@ type CreateObjectParams struct {
 }
 
 type CreateObjectRequset struct {
-	Key  string                `form:"key" binding:"required"`
-	File *multipart.FileHeader `form:"file" binding:"required"`
+	Key         string                `form:"key" binding:"required"`
+	Mode        uint                  `form:"mode,default=0" binding:"omitempty,gte=0,lte=2"`
+	Filter      string                `form:"filter" binding:"omitempty"`
+	MaxReplicas int                   `form:"maxReplicas" binding:"omitempty,gt=0,lte=100"`
+	File        *multipart.FileHeader `form:"file" binding:"required"`
+}
+
+type GetObjectQuery struct {
+	Filter string `form:"filter" binding:"omitempty"`
 }
