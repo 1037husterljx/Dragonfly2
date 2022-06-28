@@ -463,29 +463,15 @@ func (s *Server) ListSchedulers(ctx context.Context, req *manager.ListSchedulers
 	}
 
 	var pbListSchedulersResponse manager.ListSchedulersResponse
-	cacheKey := cache.MakeSchedulersCacheKey(req.HostName, req.Ip)
-
-	// Cache hit.
-	if err := s.cache.Get(ctx, cacheKey, &pbListSchedulersResponse); err == nil {
-		log.Infof("%s cache hit", cacheKey)
-		return &pbListSchedulersResponse, nil
-	}
-
-	// Cache miss.
-	log.Infof("%s cache miss", cacheKey)
-	var schedulerClusters []model.SchedulerCluster
-	if err := s.db.WithContext(ctx).Preload("SecurityGroup.SecurityRules").Preload("SeedPeerClusters.SeedPeers", "state = ?", "active").Preload("Schedulers", "state = ?", "active").Find(&schedulerClusters).Error; err != nil {
-		return nil, status.Error(codes.Unknown, err.Error())
-	}
 
 	// Search optimal scheduler clusters.
-	log.Infof("list scheduler clusters %v with hostInfo %#v", getSchedulerClusterNames(schedulerClusters), req.HostInfo)
-	schedulerClusters, err := s.searcher.FindSchedulerClusters(ctx, schedulerClusters, req)
+	schedulerClusters, err := s.searcher.FindSchedulerClusters(ctx, nil, req)
+	log.Debugf("list scheduler clusters %v with hostInfo %#v", getSchedulerClusterNames(schedulerClusters), req.HostInfo)
 	if err != nil {
 		log.Error(err)
 		return nil, status.Error(codes.NotFound, "scheduler cluster not found")
 	}
-	log.Infof("find matching scheduler cluster %v", getSchedulerClusterNames(schedulerClusters))
+	log.Debugf("find matching scheduler cluster %v", getSchedulerClusterNames(schedulerClusters))
 
 	schedulers := []model.Scheduler{}
 	for _, schedulerCluster := range schedulerClusters {
@@ -529,17 +515,6 @@ func (s *Server) ListSchedulers(ctx context.Context, req *manager.ListSchedulers
 			SeedPeers:          seedPeers,
 		})
 	}
-
-	// Cache data.
-	if err := s.cache.Once(&cachev8.Item{
-		Ctx:   ctx,
-		Key:   cacheKey,
-		Value: &pbListSchedulersResponse,
-		TTL:   s.cache.TTL,
-	}); err != nil {
-		log.Warnf("storage cache failed: %v", err)
-	}
-
 	return &pbListSchedulersResponse, nil
 }
 

@@ -27,24 +27,24 @@ func GetSN() (string, error) {
 	if sn, err = getSNFromHostinfo(); err == nil {
 		return sn, err
 	}
-	logger.Warnf("get SN from hostinfo failed: %v", err)
+	logger.Infof("get SN from hostinfo failed: %v", err)
 
 	if sn, err = getSNFromFile(); err == nil {
 		return sn, err
 	}
-	logger.Warnf("get SN from file failed: %v", err)
+	logger.Infof("get SN from file failed: %v", err)
 
 	if sn, err = getSNFromRemote(); err == nil {
 		return sn, err
 	}
-	logger.Warnf("get SN from remote failed: %v", err)
+	logger.Infof("get SN from remote failed: %v", err)
 
 	if sn, err = getSNFromHardware(); err == nil {
 		return sn, err
 	}
-	logger.Warnf("get SN from hardware failed: %v", err)
+	logger.Infof("get SN from hardware failed: %v", err)
 
-	logger.Errorf("can not get SN from anywhere")
+	logger.Warnf("can not get SN from anywhere")
 	return "", errors.New("get SN error")
 }
 

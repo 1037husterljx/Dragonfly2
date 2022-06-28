@@ -82,7 +82,10 @@ func New(cfg *config.Config, d dfpath.Dfpath) (*Server, error) {
 	}
 
 	// Initialize searcher
-	searcher := searcher.New(d.PluginDir())
+	searcher, err := searcher.NewAliSearcher(db, cache)
+	if err != nil {
+		return nil, err
+	}
 
 	// Initialize job
 	job, err := job.New(cfg)
