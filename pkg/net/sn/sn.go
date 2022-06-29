@@ -1,13 +1,14 @@
 package sn
 
 import (
-	logger "d7y.io/dragonfly/v2/internal/dflog"
-	"github.com/pkg/errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os/exec"
 	"strings"
 	"time"
+
+	logger "d7y.io/dragonfly/v2/internal/dflog"
 )
 
 var (
@@ -45,7 +46,7 @@ func GetSN() (string, error) {
 	logger.Infof("get SN from hardware failed: %v", err)
 
 	logger.Warnf("can not get SN from anywhere")
-	return "", errors.New("get SN error")
+	return "", fmt.Errorf("get SN error")
 }
 
 // getSNFromHostinfo  从hostinfo命令获取sn
@@ -61,7 +62,7 @@ func getSNFromHostinfo() (string, error) {
 			}
 		}
 	}
-	return "", errors.New("can not find sn in hostinfo program")
+	return "", fmt.Errorf("can not find sn in hostinfo program")
 }
 
 // getSNFromFile 从/usr/sbin/staragent_sn文件获取sn
@@ -88,7 +89,7 @@ func getSNFromRemote() (string, error) {
 		if resp.StatusCode == http.StatusOK {
 			return strings.TrimSpace(string(body)), nil
 		} else {
-			return "", errors.New(string(body))
+			return "", fmt.Errorf(string(body))
 		}
 	}
 }
