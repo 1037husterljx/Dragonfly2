@@ -62,7 +62,7 @@ it supports container engine, wget and other downloading tools through proxy fun
 		}
 
 		// Initialize logger
-		if err := logger.InitDaemon(cfg.Verbose, cfg.Console, d.LogDir()); err != nil {
+		if err := logger.InitDaemon(cfg.Verbose, cfg.Console, d.LogDir(), cfg.Log); err != nil {
 			return fmt.Errorf("init client daemon logger: %w", err)
 		}
 		logger.RedirectStdoutAndStderr(cfg.Console, path.Join(d.LogDir(), "daemon"))
