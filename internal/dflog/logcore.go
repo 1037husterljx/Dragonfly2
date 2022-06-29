@@ -62,13 +62,10 @@ var customGrpcLevel atomic.Bool
 
 type LogConfig struct {
 	// MaxSize is the maximum size in megabytes of the log file before it gets rotated.
-	// It defaults to 40 megabytes.
 	MaxSize int `yaml:"maxSize" mapstructure:"maxSize"`
 	// MaxBackups is the maximum number of old log files to retain.
-	// The default value is 1.
 	MaxBackups int `yaml:"maxBackups" mapstructure:"maxBackups"`
 	// MaxAge is the maximum number of days log files to retain.
-	// The default value is 7
 	MaxAge int `yaml:"maxAge" mapstructure:"maxAge"`
 	// Compress is the option of compress log data
 	Compress bool `yaml:"compress" mapstructure:"compress"`

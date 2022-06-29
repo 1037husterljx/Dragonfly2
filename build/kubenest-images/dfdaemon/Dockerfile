@@ -1,4 +1,4 @@
-FROM golang:1.17-stretch as server-builder
+FROM golang:1.18-stretch as server-builder
 
 ARG GOPROXY
 ARG GOTAGS

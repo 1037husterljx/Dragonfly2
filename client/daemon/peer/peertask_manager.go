@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
+//go:generate mockgen -destination peertask_manager_mock.go -source peertask_manager.go -package peer
+
 package peer
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"sync"
 	"time"
 
 	"github.com/go-http-utils/headers"
-	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/time/rate"
@@ -70,8 +72,6 @@ type TaskManager interface {
 	Stop(ctx context.Context) error
 }
 
-//go:generate mockgen -source peertask_manager.go -package peer -self_package d7y.io/dragonfly/v2/client/daemon/peer -destination peertask_manager_mock_test.go
-//go:generate mockgen -source peertask_manager.go -destination ../test/mock/peer/peertask_manager.go
 // Task represents common interface to operate a peer task
 type Task interface {
 	Logger

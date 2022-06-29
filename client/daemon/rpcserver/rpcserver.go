@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
+//go:generate mockgen -destination mocks/rpcserver_mock.go -source rpcserver.go -package mocks
+
 package rpcserver
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -25,7 +28,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/pkg/errors"
 	"go.uber.org/atomic"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

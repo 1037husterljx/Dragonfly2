@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
+//go:generate mockgen -destination mocks/client_mock.go -source client.go -package mocks
+
 package client
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 

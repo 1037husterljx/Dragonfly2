@@ -29,7 +29,6 @@ import (
 	"time"
 
 	"github.com/go-http-utils/headers"
-	"github.com/pkg/errors"
 
 	"d7y.io/dragonfly/v2/manager/types"
 	d7ystrings "d7y.io/dragonfly/v2/pkg/strings"
@@ -55,19 +54,19 @@ type SkylineAPI struct {
 func NewSkylineAPI() (*SkylineAPI, error) {
 	var skylineDomain = os.Getenv("skyline_domain")
 	if skylineDomain == "" {
-		return nil, errors.Errorf("skyline domain environment variable is not set")
+		return nil, fmt.Errorf("skyline domain environment variable is not set")
 	}
 	var skylineAppName = os.Getenv("skyline_appName")
 	if skylineAppName == "" {
-		return nil, errors.Errorf("skyline appName environment variable is not set")
+		return nil, fmt.Errorf("skyline appName environment variable is not set")
 	}
 	var skylineAccount = os.Getenv("skyline_account")
 	if skylineAccount == "" {
-		return nil, errors.Errorf("skyline account environment variable is not set")
+		return nil, fmt.Errorf("skyline account environment variable is not set")
 	}
 	var skylineAccessKey = os.Getenv("skyline_accessKey")
 	if skylineAccessKey == "" {
-		return nil, errors.Errorf("skyline accessKey environment variable is not set")
+		return nil, fmt.Errorf("skyline accessKey environment variable is not set")
 	}
 	return &SkylineAPI{skylineClient{
 		domain:    skylineDomain,
@@ -107,10 +106,10 @@ func (skyline *SkylineAPI) GetHostInfo(key string, value string) (*types.HostInf
 		return nil, err
 	}
 	if !resp.Success {
-		return nil, errors.Errorf("errCode:%d, errMsg:%s", resp.ErrorCode, resp.ErrorMessage)
+		return nil, fmt.Errorf("errCode:%d, errMsg:%s", resp.ErrorCode, resp.ErrorMessage)
 	}
 	if resp.Data.TotalCount != 1 || resp.Data.HasMore {
-		return nil, errors.Errorf("want only one but got %d number of host", resp.Data.TotalCount)
+		return nil, fmt.Errorf("want only one but got %d number of host", resp.Data.TotalCount)
 	}
 	hostJSON, err := json.Marshal(resp.Data.ItemList[0])
 	if err != nil {

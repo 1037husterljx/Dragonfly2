@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//go:generate mockgen -destination ./mock/mock_source_client.go -package mock d7y.io/dragonfly/v2/pkg/source ResourceClient
+
+//go:generate mockgen -destination mocks/mock_source_client.go -source source_client.go -package mocks
 
 package source
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/pkg/errors"
 
 	logger "d7y.io/dragonfly/v2/internal/dflog"
 )
@@ -121,7 +121,7 @@ type ResourceLister interface {
 
 type ClientManager interface {
 	// Register registers a source client with scheme
-	Register(scheme string, resourceClient ResourceClient, adapter requestAdapter, hook ...Hook) error
+	Register(scheme string, resourceClient ResourceClient, adapter RequestAdapter, hook ...Hook) error
 
 	// UnRegister revoke a source client from manager
 	UnRegister(scheme string)
@@ -156,13 +156,13 @@ func UpdatePluginDir(pluginDir string) {
 	_defaultManager.(*clientManager).pluginDir = pluginDir
 }
 
-func (m *clientManager) Register(scheme string, resourceClient ResourceClient, adaptor requestAdapter, hooks ...Hook) error {
+func (m *clientManager) Register(scheme string, resourceClient ResourceClient, adaptor RequestAdapter, hooks ...Hook) error {
 	scheme = strings.ToLower(scheme)
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if client, ok := m.clients[scheme]; ok {
 		if client.(*clientWrapper).rc != resourceClient {
-			return errors.Errorf("client with scheme %s already exist, current client: %#v", scheme, client)
+			return fmt.Errorf("client with scheme %s already exist, current client: %#v", scheme, client)
 		}
 		logger.Warnf("client with scheme %s already exist, no need register again", scheme)
 		return nil
@@ -231,7 +231,7 @@ func (m *clientManager) GetClient(scheme string, options ...Option) (ResourceCli
 	return client, true
 }
 
-func Register(scheme string, resourceClient ResourceClient, adaptor requestAdapter, hooks ...Hook) error {
+func Register(scheme string, resourceClient ResourceClient, adaptor RequestAdapter, hooks ...Hook) error {
 	return _defaultManager.Register(scheme, resourceClient, adaptor, hooks...)
 }
 
@@ -243,7 +243,7 @@ func ListClients() []string {
 	return _defaultManager.ListClients()
 }
 
-type requestAdapter func(request *Request) *Request
+type RequestAdapter func(request *Request) *Request
 
 // Hook TODO hook
 type Hook interface {
@@ -252,7 +252,7 @@ type Hook interface {
 }
 
 type clientWrapper struct {
-	adapter requestAdapter
+	adapter RequestAdapter
 	hooks   []Hook
 	rc      ResourceClient
 }
@@ -279,7 +279,7 @@ func (c *clientWrapper) GetLastModified(request *Request) (int64, error) {
 func GetContentLength(request *Request) (int64, error) {
 	client, ok := _defaultManager.GetClient(request.URL.Scheme)
 	if !ok {
-		return UnknownSourceFileLen, errors.Wrapf(ErrNoClientFound, "scheme: %s", request.URL.Scheme)
+		return UnknownSourceFileLen, fmt.Errorf("scheme %s: %w", request.URL.Scheme, ErrNoClientFound)
 	}
 	if _, ok := request.Context().Deadline(); !ok {
 		ctx, cancel := context.WithTimeout(context.Background(), contextTimeout)
@@ -292,7 +292,7 @@ func GetContentLength(request *Request) (int64, error) {
 func IsSupportRange(request *Request) (bool, error) {
 	client, ok := _defaultManager.GetClient(request.URL.Scheme)
 	if !ok {
-		return false, errors.Wrapf(ErrNoClientFound, "scheme: %s", request.URL.Scheme)
+		return false, fmt.Errorf("scheme %s: %w", request.URL.Scheme, ErrNoClientFound)
 	}
 	if _, ok := request.Context().Deadline(); !ok {
 		ctx, cancel := context.WithTimeout(context.Background(), contextTimeout)
@@ -308,7 +308,7 @@ func IsSupportRange(request *Request) (bool, error) {
 func IsExpired(request *Request, info *ExpireInfo) (bool, error) {
 	client, ok := _defaultManager.GetClient(request.URL.Scheme)
 	if !ok {
-		return false, errors.Wrapf(ErrNoClientFound, "scheme: %s", request.URL.Scheme)
+		return false, fmt.Errorf("scheme %s: %w", request.URL.Scheme, ErrNoClientFound)
 	}
 	if _, ok := request.Context().Deadline(); !ok {
 		ctx, cancel := context.WithTimeout(context.Background(), contextTimeout)
@@ -321,7 +321,7 @@ func IsExpired(request *Request, info *ExpireInfo) (bool, error) {
 func GetLastModified(request *Request) (int64, error) {
 	client, ok := _defaultManager.GetClient(request.URL.Scheme)
 	if !ok {
-		return -1, errors.Wrapf(ErrNoClientFound, "scheme: %s", request.URL.Scheme)
+		return -1, fmt.Errorf("scheme %s: %w", request.URL.Scheme, ErrNoClientFound)
 	}
 	if _, ok := request.Context().Deadline(); !ok {
 		ctx, cancel := context.WithTimeout(context.Background(), contextTimeout)
@@ -334,7 +334,7 @@ func GetLastModified(request *Request) (int64, error) {
 func Download(request *Request) (*Response, error) {
 	client, ok := _defaultManager.GetClient(request.URL.Scheme)
 	if !ok {
-		return nil, errors.Wrapf(ErrNoClientFound, "scheme: %s", request.URL.Scheme)
+		return nil, fmt.Errorf("scheme %s: %w", request.URL.Scheme, ErrNoClientFound)
 	}
 	return client.Download(request)
 }
@@ -342,11 +342,11 @@ func Download(request *Request) (*Response, error) {
 func List(request *Request) ([]*url.URL, error) {
 	client, ok := _defaultManager.GetClient(request.URL.Scheme)
 	if !ok {
-		return nil, errors.Wrapf(ErrNoClientFound, "scheme: %s", request.URL.Scheme)
+		return nil, fmt.Errorf("scheme %s: %w", request.URL.Scheme, ErrNoClientFound)
 	}
 	lister, ok := client.(ResourceLister)
 	if !ok {
-		return nil, errors.Wrapf(ErrClientNotSupportList, "scheme: %s", request.URL.Scheme)
+		return nil, fmt.Errorf("scheme %s: %w", request.URL.Scheme, ErrClientNotSupportList)
 	}
 	return lister.List(request)
 }

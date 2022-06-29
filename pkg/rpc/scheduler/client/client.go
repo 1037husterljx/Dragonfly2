@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-//go:generate mockgen -package mocks -source client.go -destination ./mocks/client_mock.go
+//go:generate mockgen -destination mocks/client_mock.go -source client.go -package mocks
 
 package client
 
 import (
 	"context"
+	"errors"
 	"time"
 
-	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 
 	logger "d7y.io/dragonfly/v2/internal/dflog"

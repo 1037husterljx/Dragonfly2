@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
+//go:generate mockgen -destination mocks/stroage_manager_mock.go -source storage_manager.go -package mocks
+
 package storage
 
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -31,7 +34,6 @@ import (
 	"time"
 
 	"github.com/docker/go-units"
-	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/disk"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
@@ -43,7 +45,6 @@ import (
 	"d7y.io/dragonfly/v2/pkg/rpc/base"
 )
 
-//go:generate mockgen -source storage_manager.go -destination ../test/mock/storage/manager.go
 type TaskStorageDriver interface {
 	// WritePiece put a piece of a task to storage
 	WritePiece(ctx context.Context, req *WritePieceRequest) (int64, error)
