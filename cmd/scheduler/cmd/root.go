@@ -57,7 +57,7 @@ generate and maintain a P2P network during the download process, and push suitab
 		}
 
 		// Initialize logger
-		if err := logger.InitScheduler(cfg.Verbose, cfg.Console, d.LogDir()); err != nil {
+		if err := logger.InitScheduler(cfg.Verbose, cfg.Console, d.LogDir(), cfg.Log); err != nil {
 			return fmt.Errorf("init scheduler logger: %w", err)
 		}
 		logger.RedirectStdoutAndStderr(cfg.Console, path.Join(d.LogDir(), "scheduler"))
