@@ -20,14 +20,19 @@ COPY manager/console /build
 RUN npm run build
 
 FROM reg.docker.alibaba-inc.com/amwp/kubeone-base:latest
-ENV APPNAME dragonfly2-manager
+ENV APP_NAME dragonfly2-manager
 ENV MANAGER_CONFIG /home/admin/dragonfly2-manager/config/manager.yaml
 
+RUN yum clean all && \
+    yum install tengine-proxy-2.5.4 -b current -y && \
+    yum install -b current t-security-xagent -y && \
+    yum clean all
+
+
 WORKDIR /home/admin/
-RUN echo "ps -eo pid,command|grep 'dragonfly2-manager/target/manager'|grep -v 'grep' | awk '{print \$1}'|xargs kill -2" > /home/admin/stop.sh && \
-    echo "/home/admin/dragonfly2-manager/target/manager  > /home/admin/dragonfly2-manager/service.log 2>&1 &" > /home/admin/start.sh
+COPY build/kubenest-images/manager/admin /home/admin/
 RUN chown -R admin:admin /home/admin
 
-COPY --from=server-builder /opt/dragonfly/bin/manager /home/admin/$APPNAME/target/
-COPY --from=console-builder /build/dist /home/admin/dragonfly2-manager/target/console
+COPY --from=server-builder /opt/dragonfly/bin/manager /home/admin/$APP_NAME/target/
 COPY --from=server-builder /go/bin/dlv /bin/
+COPY --from=console-builder /build/dist /home/admin/dragonfly2-manager/target/console

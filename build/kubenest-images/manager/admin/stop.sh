@@ -1,0 +1,1 @@
+/home/admin/appctl.sh stop
