@@ -17,20 +17,33 @@
 package fqdn
 
 import (
+	"os"
+
 	"github.com/Showmax/go-fqdn"
 )
 
+var Hostname string
 var FQDNHostname string
 
 func init() {
+	Hostname = hostname()
 	FQDNHostname = fqdnHostname()
+}
+
+// Get kernel hostname
+func hostname() string {
+	name, err := os.Hostname()
+	if err != nil {
+		panic(err)
+	}
+	return name
 }
 
 // Get FQDN hostname
 func fqdnHostname() string {
 	fqdn, err := fqdn.FqdnHostname()
 	if err != nil {
-		panic(err)
+		return hostname()
 	}
 
 	return fqdn
