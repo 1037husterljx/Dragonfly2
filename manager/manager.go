@@ -31,6 +31,7 @@ import (
 	"d7y.io/dragonfly/v2/manager/job"
 	"d7y.io/dragonfly/v2/manager/metrics"
 	"d7y.io/dragonfly/v2/manager/permission/rbac"
+	"d7y.io/dragonfly/v2/manager/proxy"
 	"d7y.io/dragonfly/v2/manager/router"
 	"d7y.io/dragonfly/v2/manager/rpcserver"
 	"d7y.io/dragonfly/v2/manager/searcher"
@@ -58,6 +59,9 @@ type Server struct {
 
 	// Metrics server
 	metricsServer *http.Server
+
+	// Proxy server
+	proxyServer proxy.Proxy
 }
 
 func New(cfg *config.Config, d dfpath.Dfpath) (*Server, error) {
@@ -80,6 +84,10 @@ func New(cfg *config.Config, d dfpath.Dfpath) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Initialize Proxy server
+	proxyServer := proxy.New(cfg.Database.Redis)
+	s.proxyServer = proxyServer
 
 	// Initialize searcher
 	searcher, err := searcher.NewAliSearcher(db, cache)
@@ -145,6 +153,15 @@ func New(cfg *config.Config, d dfpath.Dfpath) (*Server, error) {
 }
 
 func (s *Server) Serve() error {
+	// start Proxy Server
+	go func() {
+		if s.proxyServer != nil {
+			if err := s.proxyServer.Serve(); err != nil {
+				logger.Fatalf("proxyServer server start error %v", err)
+			}
+		}
+	}()
+
 	// Started REST server
 	go func() {
 		logger.Infof("started rest server at %s", s.restServer.Addr)
@@ -187,6 +204,9 @@ func (s *Server) Serve() error {
 }
 
 func (s *Server) Stop() {
+	// Stop Proxy server
+	s.proxyServer.Stop()
+
 	// Stop REST server
 	if err := s.restServer.Shutdown(context.Background()); err != nil {
 		logger.Errorf("rest server failed to stop: %+v", err)
