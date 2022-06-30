@@ -51,6 +51,7 @@ var peerHostConfig = DaemonOption{
 					Interval: 5 * time.Second,
 				},
 			},
+			SelectStrategy: ManagerSelectStrategyManagerReady,
 		},
 		NetAddrs: []dfnet.NetAddr{
 			{
