@@ -76,12 +76,12 @@ func (p *redisProxy) Stop() {
 }
 
 func (p *redisProxy) handleConn(conn net.Conn) {
-	logger.Infof("handling conn from %v", conn.RemoteAddr())
-	defer logger.Infof("done handling %v", conn)
+	logger.Debugf("handling conn from %v", conn.RemoteAddr())
+	defer logger.Debugf("done handling %v", conn)
 	defer conn.Close()
 	rConn, err := net.Dial("tcp", p.to)
 	if err != nil {
-		logger.Errorf("error dialing remote host %v", err)
+		logger.Debugf("error dialing remote host %v", err)
 		return
 	}
 	defer rConn.Close()
@@ -100,7 +100,7 @@ func (p *redisProxy) copy(from, to net.Conn, wg *sync.WaitGroup) {
 		return
 	default:
 		if _, err := io.Copy(to, from); err != nil {
-			logger.Errorf("error copy %v", err)
+			logger.Debugf("error copy %v", err)
 			return
 		}
 	}
