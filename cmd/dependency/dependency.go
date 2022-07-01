@@ -41,8 +41,8 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 	"gopkg.in/yaml.v3"
 
-	"d7y.io/dragonfly/v2/client/clientutil"
 	"d7y.io/dragonfly/v2/client/config"
+	"d7y.io/dragonfly/v2/client/util"
 	"d7y.io/dragonfly/v2/cmd/dependency/base"
 	logger "d7y.io/dragonfly/v2/internal/dflog"
 	"d7y.io/dragonfly/v2/pkg/dfnet"
@@ -55,7 +55,7 @@ import (
 
 // InitCobra initializes flags binding and common sub cmds.
 // config is a pointer to configuration struct.
-func InitCobra(cmd *cobra.Command, useConfigFile bool, config interface{}) {
+func InitCobra(cmd *cobra.Command, useConfigFile bool, config any) {
 	rootName := cmd.Root().Name()
 	cobra.OnInitialize(func() { initConfig(useConfigFile, rootName, config) })
 
@@ -155,7 +155,7 @@ func SetupQuitSignalHandler(handler func()) {
 }
 
 // initConfig reads in config file and ENV variables if set.
-func initConfig(useConfigFile bool, name string, config interface{}) {
+func initConfig(useConfigFile bool, name string, config any) {
 	// Use config file and read once.
 	if useConfigFile {
 		cfgFile := viper.GetString("config")
@@ -189,12 +189,12 @@ func initConfig(useConfigFile bool, name string, config interface{}) {
 }
 
 func initDecoderConfig(dc *mapstructure.DecoderConfig) {
-	dc.DecodeHook = mapstructure.ComposeDecodeHookFunc(func(from, to reflect.Type, v interface{}) (interface{}, error) {
+	dc.DecodeHook = mapstructure.ComposeDecodeHookFunc(func(from, to reflect.Type, v any) (any, error) {
 		switch to {
 		case reflect.TypeOf(unit.B),
 			reflect.TypeOf(dfnet.NetAddr{}),
-			reflect.TypeOf(clientutil.RateLimit{}),
-			reflect.TypeOf(clientutil.Duration{}),
+			reflect.TypeOf(util.RateLimit{}),
+			reflect.TypeOf(util.Duration{}),
 			reflect.TypeOf(&config.ProxyOption{}),
 			reflect.TypeOf(config.TCPListenPortRange{}),
 			reflect.TypeOf(config.FileString("")),
