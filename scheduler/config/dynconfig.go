@@ -24,6 +24,10 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+
+	"d7y.io/dragonfly/v2/internal/constants"
 	logger "d7y.io/dragonfly/v2/internal/dflog"
 	dc "d7y.io/dragonfly/v2/internal/dynconfig"
 	"d7y.io/dragonfly/v2/manager/types"
@@ -37,6 +41,15 @@ var (
 
 	// Notify observer interval.
 	watchInterval = 10 * time.Second
+)
+
+var (
+	clusterNameGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: constants.MetricsNamespace,
+		Subsystem: constants.SchedulerMetricsName,
+		Name:      "cluster_name",
+		Help:      "scheduler cluster name ",
+	}, []string{"name"})
 )
 
 type DynconfigData struct {
@@ -77,6 +90,7 @@ type SeedPeerCluster struct {
 type SchedulerCluster struct {
 	Config       []byte `yaml:"config" mapstructure:"config" json:"config"`
 	ClientConfig []byte `yaml:"clientConfig" mapstructure:"clientConfig" json:"client_config"`
+	ClusterName  string `yaml:"name" mapstructure:"name"`
 }
 
 type DynconfigInterface interface {
@@ -184,6 +198,8 @@ func (d *dynconfig) Get() (*DynconfigData, error) {
 		return nil, err
 	}
 
+	// dynamically set cluster name
+	clusterNameGauge.WithLabelValues(config.SchedulerCluster.ClusterName).Set(1)
 	return &config, nil
 }
 

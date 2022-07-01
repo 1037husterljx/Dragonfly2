@@ -159,6 +159,13 @@ var (
 		Name:      "prefetch_task_total",
 		Help:      "Counter of the total prefetched tasks.",
 	})
+
+	ClusterIDGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: constants.MetricsNamespace,
+		Subsystem: constants.DfdaemonMetricsName,
+		Name:      "cluster_id",
+		Help:      "seedPeer cluster id",
+	}, []string{"id"})
 )
 
 func New(addr string) *http.Server {
