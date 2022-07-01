@@ -786,7 +786,7 @@ func (cd *clientDaemon) announceSeedPeer() error {
 		objectStoragePort = int32(cd.Option.ObjectStorage.TCPListen.PortRange.Start)
 	}
 
-	if _, err := cd.managerClient.UpdateSeedPeer(&manager.UpdateSeedPeerRequest{
+	if resp, err := cd.managerClient.UpdateSeedPeer(&manager.UpdateSeedPeerRequest{
 		SourceType:        manager.SourceType_SEED_PEER_SOURCE,
 		HostName:          cd.Option.Host.Hostname,
 		Type:              cd.Option.Scheduler.Manager.SeedPeer.Type,
@@ -800,8 +800,9 @@ func (cd *clientDaemon) announceSeedPeer() error {
 		SeedPeerClusterId: uint64(cd.Option.Scheduler.Manager.SeedPeer.ClusterID),
 	}); err != nil {
 		return err
+	} else {
+		metrics.ClusterIDGauge.WithLabelValues(fmt.Sprintf("%d", resp.SeedPeerClusterId)).Set(1)
 	}
-
 	return nil
 }
 

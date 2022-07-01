@@ -19,6 +19,7 @@ var SN string
 
 func init() {
 	SN, _ = GetSN()
+	logger.Infof("use sn :%s", SN)
 }
 
 func GetSN() (string, error) {
