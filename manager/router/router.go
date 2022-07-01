@@ -62,6 +62,9 @@ func Init(cfg *config.Config, logDir string, service service.Service, enforcer *
 
 	// Prometheus metrics
 	p := ginprometheus.NewPrometheus(PrometheusSubsystemName)
+	p.ReqCntURLLabelMappingFn = func(c *gin.Context) string {
+		return c.Request.URL.Path // no query string
+	}
 	p.Use(r)
 
 	// Opentelemetry
