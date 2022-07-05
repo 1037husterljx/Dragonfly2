@@ -32,6 +32,7 @@ import (
 	"d7y.io/dragonfly/v2/client/config"
 	server "d7y.io/dragonfly/v2/client/daemon"
 	"d7y.io/dragonfly/v2/cmd/dependency"
+	"d7y.io/dragonfly/v2/internal/constants"
 	logger "d7y.io/dragonfly/v2/internal/dflog"
 	"d7y.io/dragonfly/v2/pkg/dfnet"
 	"d7y.io/dragonfly/v2/pkg/dfpath"
@@ -101,7 +102,7 @@ func init() {
 func initDaemonDfpath(cfg *config.DaemonOption) (dfpath.Dfpath, error) {
 	var options []dfpath.Option
 	if cfg.WorkHome != "" {
-		options = append(options, dfpath.WithWorkHome(cfg.WorkHome))
+		options = append(options, dfpath.WithUserWorkHome(cfg.WorkHome))
 	}
 
 	if cfg.CacheDir != "" {
@@ -158,6 +159,7 @@ func runDaemon(d dfpath.Dfpath) error {
 				return errors.New("the daemon is running, so there is no need to start it again")
 			}
 		} else {
+			_ = os.Chmod(lock.Path(), constants.DefaultDirectoryMode)
 			break
 		}
 	}

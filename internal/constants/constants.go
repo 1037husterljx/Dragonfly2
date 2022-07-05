@@ -16,6 +16,8 @@
 
 package constants
 
+import "os"
+
 const (
 	// download pattern
 	SourcePattern   = "source"
@@ -28,4 +30,8 @@ const (
 	ManagerMetricsName   = "manager"
 	SchedulerMetricsName = "scheduler"
 	DfdaemonMetricsName  = "dfdaemon"
+)
+
+const (
+	DefaultDirectoryMode = os.FileMode(0777)
 )
