@@ -165,7 +165,7 @@ var (
 		Subsystem: constants.DfdaemonMetricsName,
 		Name:      "cluster_id",
 		Help:      "seedPeer cluster id",
-	}, []string{"id"})
+	}, []string{"cluster_id"})
 )
 
 func New(addr string) *http.Server {
