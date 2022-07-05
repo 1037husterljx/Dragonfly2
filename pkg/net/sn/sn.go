@@ -50,7 +50,7 @@ func getSNFromHostinfo() (string, error) {
 	} else {
 		for _, line := range strings.Split(string(info), "\n") {
 			s := strings.TrimSpace(line)
-			if strings.HasSuffix(s, "sn") {
+			if strings.HasPrefix(s, "sn") {
 				return strings.TrimSpace(s[2:]), nil
 			}
 		}
