@@ -55,9 +55,6 @@ type CacheOption struct {
 	// LogDir is log directory of dfcache.
 	LogDir string `yaml:"logDir,omitempty" mapstructure:"logDir,omitempty"`
 
-	// WorkHome is working directory of dfcache.
-	WorkHome string `yaml:"workHome,omitempty" mapstructure:"workHome,omitempty"`
-
 	// Output full output path for export task
 	Output string `yaml:"output,omitempty" mapstructure:"output,omitempty"`
 

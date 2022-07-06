@@ -19,7 +19,7 @@
 
 package dfpath
 
-var DefaultWorkHome = "/usr/local/dragonfly"
+var DefaultWorkHome = "/home/staragent/plugins/dragonfly2-yace/local_data"
 var DefaultCacheDir = "/var/cache/dragonfly"
 var DefaultConfigDir = "/etc/dragonfly"
 

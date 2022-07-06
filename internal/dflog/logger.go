@@ -292,7 +292,7 @@ func RedirectStdoutAndStderr(console bool, logDir string) {
 
 	// Redirect stdout to stdout.log file.
 	stdoutPath := path.Join(logDir, "stdout.log")
-	if stdout, err := os.OpenFile(stdoutPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND|os.O_SYNC, 0644); err != nil {
+	if stdout, err := os.OpenFile(stdoutPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND|os.O_SYNC, 0666); err != nil {
 		Warnf("open %s error: %s", stdoutPath, err)
 	} else if err := unix.Dup2(int(stdout.Fd()), int(os.Stdout.Fd())); err != nil {
 		Warnf("redirect stdout error: %s", err)
@@ -300,7 +300,7 @@ func RedirectStdoutAndStderr(console bool, logDir string) {
 
 	// Redirect stderr to stderr.log file.
 	stderrPath := path.Join(logDir, "stderr.log")
-	if stderr, err := os.OpenFile(stderrPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND|os.O_SYNC, 0644); err != nil {
+	if stderr, err := os.OpenFile(stderrPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND|os.O_SYNC, 0666); err != nil {
 		Warnf("open %s error: %s", stderrPath, err)
 	} else if err := unix.Dup2(int(stderr.Fd()), int(os.Stderr.Fd())); err != nil {
 		Warnf("redirect stderr error: %s", err)

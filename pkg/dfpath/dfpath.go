@@ -20,10 +20,12 @@ package dfpath
 
 import (
 	"fmt"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"sync"
+
+	"d7y.io/dragonfly/v2/internal/constants"
+	"d7y.io/dragonfly/v2/pkg/basic"
 )
 
 // Dfpath is the interface used for init project path
@@ -70,6 +72,21 @@ func WithWorkHome(dir string) Option {
 	}
 }
 
+// WithUserWorkHome set the workhome/user directory
+func WithUserWorkHome(dir string) Option {
+	return func(d *dfpath) {
+		d.workHome = dir
+		d.cacheDir = filepath.Join(d.workHome, "cache")
+		d.logDir = filepath.Join(d.workHome, "logs")
+		d.dataDir = filepath.Join(d.workHome, "data")
+		if basic.UserID != 0 {
+			d.cacheDir = filepath.Join(d.cacheDir, basic.Username)
+			d.dataDir = filepath.Join(d.dataDir, basic.Username)
+			d.logDir = filepath.Join(d.logDir, basic.Username)
+		}
+	}
+}
+
 // WithCacheDir set the cache directory
 func WithCacheDir(dir string) Option {
 	return func(d *dfpath) {
@@ -113,7 +130,7 @@ func New(options ...Option) (Dfpath, error) {
 		// Create directories
 		for name, dir := range map[string]string{"workHome": d.workHome, "cacheDir": d.cacheDir, "logDir": d.logDir, "dataDir": d.dataDir,
 			"pluginDir": d.pluginDir} {
-			if err := os.MkdirAll(dir, fs.FileMode(0755)); err != nil {
+			if err := os.MkdirAll(dir, constants.DefaultDirectoryMode); err != nil {
 				cache.errs = append(cache.errs, fmt.Errorf("create %s dir %s failed: %v", name, dir, err))
 			}
 		}
