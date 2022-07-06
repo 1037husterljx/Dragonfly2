@@ -19,11 +19,11 @@
 
 package dfpath
 
-var DefaultWorkHome = "/home/staragent/plugins/dragonfly2-yace/local_data"
+var DefaultWorkHome = "/home/staragent/plugins/dragonfly2/local_data"
 var DefaultCacheDir = "/var/cache/dragonfly"
 var DefaultConfigDir = "/etc/dragonfly"
 
 // DefaultAliConfigDir ali内部SA插件形式部署
-var DefaultAliConfigDir = "/home/staragent/plugins/dragonfly2-yace/config"
+var DefaultAliConfigDir = "/home/staragent/plugins/dragonfly2/config"
 var DefaultLogDir = "/var/log/dragonfly"
 var DefaultDataDir = "/var/lib/dragonfly"
