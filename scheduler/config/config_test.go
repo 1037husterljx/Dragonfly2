@@ -35,14 +35,6 @@ func TestConfig_Load(t *testing.T) {
 	assert := testifyassert.New(t)
 
 	config := &Config{
-		Server: &ServerConfig{
-			IP:       "127.0.0.1",
-			Host:     "foo",
-			Listen:   "0.0.0.0",
-			Port:     8002,
-			CacheDir: "foo",
-			LogDir:   "bar",
-		},
 		Scheduler: &SchedulerConfig{
 			Algorithm:            "default",
 			BackSourceCount:      3,
@@ -58,13 +50,16 @@ func TestConfig_Load(t *testing.T) {
 				HostTTL:        10 * time.Minute,
 			},
 		},
+		Server: &ServerConfig{
+			IP:       "127.0.0.1",
+			Host:     "foo",
+			Listen:   "0.0.0.0",
+			Port:     8002,
+			CacheDir: "foo",
+			LogDir:   "bar",
+		},
 		DynConfig: &DynConfig{
 			RefreshInterval: 5 * time.Minute,
-		},
-		Host: &HostConfig{
-			IDC:         "foo",
-			NetTopology: "bar",
-			Location:    "baz",
 		},
 		Manager: &ManagerConfig{
 			Addr:               "127.0.0.1:65003",
@@ -75,6 +70,11 @@ func TestConfig_Load(t *testing.T) {
 		},
 		SeedPeer: &SeedPeerConfig{
 			Enable: true,
+		},
+		Host: &HostConfig{
+			IDC:         "foo",
+			NetTopology: "bar",
+			Location:    "baz",
 		},
 		Job: &JobConfig{
 			Enable:             true,

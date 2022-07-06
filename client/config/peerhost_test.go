@@ -26,6 +26,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"d7y.io/dragonfly/v2/client/util"
+	"d7y.io/dragonfly/v2/cmd/dependency/base"
 	"d7y.io/dragonfly/v2/manager/model"
 	"d7y.io/dragonfly/v2/pkg/dfnet"
 	"d7y.io/dragonfly/v2/pkg/unit"
@@ -219,12 +220,22 @@ func TestPeerHostOption_Load(t *testing.T) {
 	hijackExp, _ := NewRegexp("mirror.aliyuncs.com:443")
 
 	peerHostOption := &DaemonOption{
+		Options: base.Options{
+			Console:   true,
+			Verbose:   true,
+			PProfPort: -1,
+			Telemetry: base.TelemetryOption{
+				Jaeger:      "foo",
+				ServiceName: "bar",
+			},
+		},
 		AliveTime: util.Duration{
 			Duration: 0,
 		},
 		GCInterval: util.Duration{
 			Duration: 60000000000,
 		},
+		Metrics:     ":8000",
 		DataDir:     "/var/lib/dragonfly/",
 		LogDir:      "/var/log/dragonfly/",
 		CacheDir:    "/var/cache/dragonfly/",
@@ -257,6 +268,7 @@ func TestPeerHostOption_Load(t *testing.T) {
 			ScheduleTimeout: util.Duration{
 				Duration: 0,
 			},
+			DisableAutoBackSource: true,
 		},
 		Host: HostOption{
 			Hostname:       "d7y.io",
@@ -268,13 +280,14 @@ func TestPeerHostOption_Load(t *testing.T) {
 			AdvertiseIP:    "0.0.0.0",
 		},
 		Download: DownloadOption{
-			PieceDownloadTimeout: 30 * time.Second,
+			DefaultPattern: PatternP2P,
 			TotalRateLimit: util.RateLimit{
 				Limit: 209715200,
 			},
 			PerPeerRateLimit: util.RateLimit{
 				Limit: 20971520,
 			},
+			PieceDownloadTimeout: 30 * time.Second,
 			DownloadGRPC: ListenOption{
 				Security: SecurityOption{
 					Insecure:  true,
@@ -282,7 +295,9 @@ func TestPeerHostOption_Load(t *testing.T) {
 					Cert:      "cert",
 					Key:       "key",
 					TLSVerify: true,
+					TLSConfig: nil,
 				},
+				TCPListen: nil,
 				UnixListen: &UnixListenOption{
 					Socket: "/tmp/dfdaemon.sock",
 				},
@@ -294,6 +309,7 @@ func TestPeerHostOption_Load(t *testing.T) {
 					Cert:      "cert",
 					Key:       "key",
 					TLSVerify: true,
+					TLSConfig: nil,
 				},
 				TCPListen: &TCPListenOption{
 					Listen: "0.0.0.0",
@@ -302,6 +318,28 @@ func TestPeerHostOption_Load(t *testing.T) {
 						End:   0,
 					},
 				},
+			},
+			CalculateDigest: true,
+			Transport: &TransportOption{
+				DialTimeout:           time.Second,
+				KeepAlive:             time.Second,
+				MaxIdleConns:          1,
+				IdleConnTimeout:       time.Second,
+				ResponseHeaderTimeout: time.Second,
+				TLSHandshakeTimeout:   time.Second,
+				ExpectContinueTimeout: time.Second,
+			},
+			GetPiecesMaxRetry: 1,
+			Prefetch:          true,
+			WatchdogTimeout:   time.Second,
+			Concurrent: &ConcurrentOption{
+				ThresholdSize: util.Size{
+					Limit: 1,
+				},
+				GoroutineCount: 1,
+				InitBackoff:    1,
+				MaxBackoff:     1,
+				MaxAttempts:    1,
 			},
 		},
 		Upload: UploadOption{
@@ -351,7 +389,13 @@ func TestPeerHostOption_Load(t *testing.T) {
 			TaskExpireTime: util.Duration{
 				Duration: 180000000000,
 			},
-			StoreStrategy: StoreStrategy("io.d7y.storage.v2.simple"),
+			StoreStrategy:          StoreStrategy("io.d7y.storage.v2.simple"),
+			DiskGCThreshold:        60 * unit.MB,
+			DiskGCThresholdPercent: 0.6,
+			Multiplex:              true,
+		},
+		Health: &HealthOption{
+			Path: "/health",
 		},
 		Proxy: &ProxyOption{
 			ListenOption: ListenOption{
@@ -370,6 +414,12 @@ func TestPeerHostOption_Load(t *testing.T) {
 					},
 				},
 			},
+			BasicAuth: &BasicAuth{
+				Username: "foo",
+				Password: "bar",
+			},
+			DefaultFilter:  "baz",
+			MaxConcurrency: 1,
 			RegistryMirror: &RegistryMirror{
 				Remote: &URL{
 					&url.URL{
@@ -377,8 +427,20 @@ func TestPeerHostOption_Load(t *testing.T) {
 						Scheme: "https",
 					},
 				},
-				Insecure: true,
-				Direct:   false,
+				DynamicRemote: true,
+				UseProxies:    true,
+				Insecure:      true,
+				Direct:        false,
+			},
+			WhiteList: []*WhiteList{
+				{
+					Host: "foo",
+					Regx: proxyExp,
+					Ports: []string{
+						"1000",
+						"2000",
+					},
+				},
 			},
 			Proxies: []*ProxyRule{
 				{
@@ -397,6 +459,27 @@ func TestPeerHostOption_Load(t *testing.T) {
 						Insecure: true,
 					},
 				},
+				SNI: nil,
+			},
+			DumpHTTPContent: true,
+			ExtraRegistryMirrors: []*RegistryMirror{
+				{
+					Remote: &URL{
+						&url.URL{
+							Host:   "index.docker.io",
+							Scheme: "https",
+						},
+					},
+					DynamicRemote: true,
+					UseProxies:    true,
+					Insecure:      true,
+					Direct:        true,
+				},
+			},
+		},
+		Reload: ReloadOption{
+			Interval: util.Duration{
+				Duration: 180000000000,
 			},
 		},
 	}
