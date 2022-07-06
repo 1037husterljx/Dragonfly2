@@ -17,6 +17,7 @@
 package fqdn
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/Showmax/go-fqdn"
@@ -43,6 +44,7 @@ func hostname() string {
 func fqdnHostname() string {
 	fqdn, err := fqdn.FqdnHostname()
 	if err != nil {
+		fmt.Printf("fqdn hostname get failed:%v", err)
 		return hostname()
 	}
 
