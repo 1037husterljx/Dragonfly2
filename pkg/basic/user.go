@@ -24,6 +24,7 @@ import (
 	"strings"
 	"syscall"
 
+	logger "d7y.io/dragonfly/v2/internal/dflog"
 	pkgstrings "d7y.io/dragonfly/v2/pkg/strings"
 )
 
@@ -38,8 +39,8 @@ var (
 func init() {
 	u, err := user.Current()
 	if err != nil {
-		fmt.Printf("Failed to get current user: %s", err.Error())
-		fmt.Println("Use uid as Username")
+		logger.Warnf("Failed to get current user: %s", err.Error())
+		logger.Info("Use uid as Username")
 
 		UserID = syscall.Getuid()
 		Username = fmt.Sprintf("%d", UserID)

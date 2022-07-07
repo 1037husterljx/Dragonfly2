@@ -37,7 +37,6 @@ import (
 	"d7y.io/dragonfly/v2/client/config"
 	"d7y.io/dragonfly/v2/client/daemon/storage"
 	"d7y.io/dragonfly/v2/client/util"
-	"d7y.io/dragonfly/v2/internal/constants"
 	logger "d7y.io/dragonfly/v2/internal/dflog"
 )
 
@@ -114,7 +113,6 @@ func (um *uploadManager) initRouter(cfg *config.DaemonOption, logDir string) *gi
 		gin.DisableConsoleColor()
 		logDir := filepath.Join(logDir, "daemon")
 		f, _ := os.Create(filepath.Join(logDir, GinLogFileName))
-		_ = os.Chmod(filepath.Join(logDir, GinLogFileName), constants.DefaultDirectoryMode)
 		gin.DefaultWriter = io.MultiWriter(f)
 	}
 

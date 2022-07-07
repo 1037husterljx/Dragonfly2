@@ -124,7 +124,6 @@ func Execute() {
 }
 
 func init() {
-	syscall.Umask(0)
 	// Initialize default dfget config
 	dfgetConfig = config.NewDfgetConfig()
 	// Initialize cobra
@@ -253,7 +252,6 @@ func checkAndSpawnDaemon(dfgetLockPath, daemonSockPath string) (client.DaemonCli
 		logger.Errorf("flock lock failed %s", err)
 		return nil, err
 	}
-	_ = os.Chmod(dfgetLockPath, constants.DefaultDirectoryMode)
 
 	defer func() {
 		if err := lock.Unlock(); err != nil {

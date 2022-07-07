@@ -47,7 +47,6 @@ import (
 	"d7y.io/dragonfly/v2/client/daemon/storage"
 	"d7y.io/dragonfly/v2/client/daemon/upload"
 	"d7y.io/dragonfly/v2/client/util"
-	"d7y.io/dragonfly/v2/internal/constants"
 	logger "d7y.io/dragonfly/v2/internal/dflog"
 	"d7y.io/dragonfly/v2/manager/searcher"
 	"d7y.io/dragonfly/v2/pkg/dfnet"
@@ -374,7 +373,6 @@ func (cd *clientDaemon) Serve() error {
 		Type: dfnet.UNIX,
 		Addr: cd.Option.Download.DownloadGRPC.UnixListen.Socket,
 	})
-	_ = os.Chmod(cd.Option.Download.DownloadGRPC.UnixListen.Socket, constants.DefaultDirectoryMode)
 	if err != nil {
 		logger.Errorf("failed to listen for download grpc service: %v", err)
 		return err
