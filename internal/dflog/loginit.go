@@ -17,14 +17,10 @@
 package logger
 
 import (
-	"os"
 	"path"
 	"path/filepath"
 
 	"go.uber.org/zap"
-
-	"d7y.io/dragonfly/v2/internal/constants"
-	"d7y.io/dragonfly/v2/pkg/basic"
 )
 
 type logInitMeta struct {
@@ -181,10 +177,6 @@ func InitDfget(verbose, console bool, dir string) error {
 		return createConsoleLogger(verbose)
 	}
 
-	if basic.UserID != 0 {
-		dir = filepath.Join(dir, basic.Username)
-	}
-
 	logDir := filepath.Join(dir, "dfget")
 
 	var meta = []logInitMeta{
@@ -227,8 +219,6 @@ func createConsoleLogger(verbose bool) error {
 
 func createFileLogger(verbose bool, meta []logInitMeta, logDir string) error {
 	levels = nil
-
-	_ = os.MkdirAll(logDir, constants.DefaultDirectoryMode)
 
 	for _, m := range meta {
 		log, level, err := CreateLogger(path.Join(logDir, m.fileName), false, verbose, m.logConfig)

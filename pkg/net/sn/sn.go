@@ -7,6 +7,8 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+
+	logger "d7y.io/dragonfly/v2/internal/dflog"
 )
 
 var (
@@ -17,6 +19,7 @@ var SN string
 
 func init() {
 	SN, _ = GetSN()
+	logger.Infof("use sn :%s", SN)
 }
 
 func GetSN() (string, error) {
@@ -26,19 +29,24 @@ func GetSN() (string, error) {
 	if sn, err = getSNFromHostinfo(); err == nil {
 		return sn, err
 	}
+	logger.Infof("get SN from hostinfo failed: %v", err)
 
 	if sn, err = getSNFromFile(); err == nil {
 		return sn, err
 	}
+	logger.Infof("get SN from file failed: %v", err)
 
 	if sn, err = getSNFromRemote(); err == nil {
 		return sn, err
 	}
+	logger.Infof("get SN from remote failed: %v", err)
 
 	if sn, err = getSNFromHardware(); err == nil {
 		return sn, err
 	}
+	logger.Infof("get SN from hardware failed: %v", err)
 
+	logger.Warnf("can not get SN from anywhere")
 	return "", fmt.Errorf("get SN error")
 }
 
