@@ -54,6 +54,7 @@ const (
 
 const (
 	HyperLogLogNamespace = "PeerSet"
+	HyperLogLogSlotKey   = "PeerSet"
 	HyperLogLogShortTLL  = time.Minute * 30
 	HyperLogLogLongTLL   = time.Hour * 24
 )
@@ -119,5 +120,5 @@ func MakeBucketsCacheKey(name string) string {
 
 // MakeHLLCacheKey Make cache key for redis hll within expire time.
 func MakeHLLCacheKey(t time.Time) string {
-	return MakeCacheKey(HyperLogLogNamespace, fmt.Sprintf("%s-%s-%s", strconv.Itoa(int(t.Weekday())), strconv.Itoa(t.Hour()), strconv.Itoa(t.Minute())))
+	return MakeCacheKey(HyperLogLogNamespace, fmt.Sprintf("%s-%s-%s{%s}", strconv.Itoa(int(t.Weekday())), strconv.Itoa(t.Hour()), strconv.Itoa(t.Minute()), HyperLogLogSlotKey))
 }
