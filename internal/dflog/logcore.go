@@ -17,6 +17,7 @@
 package logger
 
 import (
+	path "path/filepath"
 	"strings"
 
 	"go.uber.org/atomic"
@@ -124,6 +125,10 @@ func CreateLogger(filePath string, stats bool, verbose bool, cfg LogConfig) (*za
 	if !stats {
 		opts = append(opts, zap.AddCaller(), zap.AddStacktrace(zap.WarnLevel), zap.AddCallerSkip(1))
 	}
+
+	_, logName := path.Split(filePath)
+	logName = logName[:strings.Index(logName, ".")]
+	opts = append(opts, zap.Hooks(zapLogHook(logName)))
 
 	return zap.New(core, opts...), level, nil
 }
