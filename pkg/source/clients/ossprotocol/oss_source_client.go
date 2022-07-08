@@ -20,7 +20,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/textproto"
 	"strconv"
+	gostrings "strings"
 	"sync"
 	"time"
 
@@ -155,7 +157,10 @@ func (osc *ossSourceClient) Download(request *source.Request) (*source.Response,
 	if err != nil {
 		return nil, fmt.Errorf("get oss bucket %s: %w", request.URL.Host, err)
 	}
-	objectResult, err := bucket.DoGetObject(&oss.GetObjectRequest{ObjectKey: request.URL.Path}, getOptions(request.Header))
+	objectResult, err := bucket.DoGetObject(
+		&oss.GetObjectRequest{ObjectKey: removeLeadingSlash(request.URL.Path)},
+		getOptions(request.Header),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("get oss Object %s: %w", request.URL.Path, err)
 	}
@@ -233,11 +238,22 @@ func buildClientKey(endpoint, accessKeyID, accessKeySecret string) string {
 
 func getOptions(header source.Header) []oss.Option {
 	opts := make([]oss.Option, 0, len(header))
-	for key, value := range header {
-		if key == endpoint || key == accessKeyID || key == accessKeySecret {
+	for key, values := range header {
+		if key == textproto.CanonicalMIMEHeaderKey(endpoint) || key == textproto.CanonicalMIMEHeaderKey(accessKeyID) || key == textproto.CanonicalMIMEHeaderKey(accessKeySecret) {
 			continue
 		}
+		// oss Header value must be string type, while http header value is []string type
+		// according to HTTP RFC2616 Multiple message-header fields with the same field-name MAY be present in a message
+		// if and only if the entire field-value for that header field is defined as a comma-separated list
+		value := gostrings.Join(values, ",")
 		opts = append(opts, oss.SetHeader(key, value))
 	}
 	return opts
+}
+
+func removeLeadingSlash(s string) string {
+	if s[0] == '/' {
+		return s[1:]
+	}
+	return s
 }
