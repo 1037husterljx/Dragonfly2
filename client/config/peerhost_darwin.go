@@ -99,8 +99,8 @@ var peerHostConfig = DaemonOption{
 			TCPListen: &TCPListenOption{
 				Listen: net.IPv4zero.String(),
 				PortRange: TCPListenPortRange{
-					Start: 65000,
-					End:   65535,
+					Start: DefaultPeerStartPort,
+					End:   DefaultEndPort,
 				},
 			},
 		},
@@ -117,8 +117,8 @@ var peerHostConfig = DaemonOption{
 			TCPListen: &TCPListenOption{
 				Listen: net.IPv4zero.String(),
 				PortRange: TCPListenPortRange{
-					Start: 65002,
-					End:   65535,
+					Start: DefaultUploadStartPort,
+					End:   DefaultEndPort,
 				},
 			},
 		},
@@ -135,8 +135,8 @@ var peerHostConfig = DaemonOption{
 			TCPListen: &TCPListenOption{
 				Listen: net.IPv4zero.String(),
 				PortRange: TCPListenPortRange{
-					Start: 65004,
-					End:   65535,
+					Start: DefaultObjectStorageStartPort,
+					End:   DefaultEndPort,
 				},
 			},
 		},
