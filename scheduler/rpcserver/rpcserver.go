@@ -54,9 +54,10 @@ func New(service *service.Service, opts ...grpc.ServerOption) *grpc.Server {
 // RegisterPeerTask registers peer and triggers seed peer download task.
 func (s *Server) RegisterPeerTask(ctx context.Context, req *scheduler.PeerTaskRequest) (*scheduler.RegisterResult, error) {
 	bizTag := resource.DefaultBizTag
-	if req.UrlMeta.Tag != "" {
-		bizTag = req.UrlMeta.Tag
-	}
+	// FIXME temporarily disable bizTag
+	//if req.UrlMeta.Tag != "" {
+	//	bizTag = req.UrlMeta.Tag
+	//}
 	metrics.RegisterPeerTaskCount.WithLabelValues(bizTag).Inc()
 
 	resp, err := s.service.RegisterPeerTask(ctx, req)
