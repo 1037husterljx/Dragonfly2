@@ -83,7 +83,8 @@ func (s *Service) RegisterPeerTask(ctx context.Context, req *rpcscheduler.PeerTa
 		return nil, dferrors.New(base.Code_SchedTaskStatusError, msg)
 	}
 	host := s.registerHost(ctx, req.PeerHost)
-	peer := s.registerPeer(ctx, req.PeerId, task, host, req.UrlMeta.Tag)
+	// fixme correct biz_tag
+	peer := s.registerPeer(ctx, req.PeerId, task, host, resource.DefaultBizTag)
 	peer.Log.Infof("register peer task request: %#v %#v %#v", req, req.UrlMeta, req.HostLoad)
 
 	// When the peer registers for the first time and
