@@ -108,11 +108,9 @@ func initDaemonDfpath(cfg *config.DaemonOption) (dfpath.Dfpath, error) {
 		options = append(options, dfpath.WithLogDir(cfg.LogDir))
 	}
 
-	cacheDir := dfpath.DefaultCacheDir
 	if cfg.CacheDir != "" {
-		cacheDir = cfg.CacheDir
+		options = append(options, dfpath.WithCacheDir(cfg.CacheDir))
 	}
-	options = append(options, dfpath.WithCacheDir(cacheDir))
 
 	dataDir := dfpath.DefaultDataDir
 	if cfg.DataDir != "" {
