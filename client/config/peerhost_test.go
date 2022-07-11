@@ -442,7 +442,7 @@ func TestPeerHostOption_Load(t *testing.T) {
 					},
 				},
 			},
-			Proxies: []*ProxyRule{
+			ProxyRules: []*ProxyRule{
 				{
 					Regx:     proxyExp,
 					UseHTTPS: false,

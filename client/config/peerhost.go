@@ -67,12 +67,11 @@ type DaemonOption struct {
 	ObjectStorage ObjectStorageOption `mapstructure:"objectStorage" yaml:"objectStorage"`
 	Storage       StorageOption       `mapstructure:"storage" yaml:"storage"`
 	Health        *HealthOption       `mapstructure:"health" yaml:"health"`
-	// TODO WIP, did not use
-	Reload ReloadOption `mapstructure:"reloadOption" yaml:"reloadOption"`
+	Reload        ReloadOption        `mapstructure:"reload" yaml:"reload"`
 }
 
 func NewDaemonConfig() *DaemonOption {
-	return &peerHostConfig
+	return peerHostConfig()
 }
 
 func (p *DaemonOption) Load(path string) error {
@@ -148,6 +147,10 @@ func (p *DaemonOption) Validate() error {
 		if p.ObjectStorage.MaxReplicas <= 0 {
 			return errors.New("max replicas must be greater than 0")
 		}
+	}
+
+	if p.Reload.Interval.Duration > 0 && p.Reload.Interval.Duration < time.Second {
+		return errors.New("reload interval too short, must great than 1 second")
 	}
 
 	switch p.Download.DefaultPattern {
@@ -278,7 +281,7 @@ type ProxyOption struct {
 	MaxConcurrency  int64           `mapstructure:"maxConcurrency" yaml:"maxConcurrency"`
 	RegistryMirror  *RegistryMirror `mapstructure:"registryMirror" yaml:"registryMirror"`
 	WhiteList       []*WhiteList    `mapstructure:"whiteList" yaml:"whiteList"`
-	Proxies         []*ProxyRule    `mapstructure:"proxies" yaml:"proxies"`
+	ProxyRules      []*ProxyRule    `mapstructure:"proxies" yaml:"proxies"`
 	HijackHTTPS     *HijackConfig   `mapstructure:"hijackHTTPS" yaml:"hijackHTTPS"`
 	DumpHTTPContent bool            `mapstructure:"dumpHTTPContent" yaml:"dumpHTTPContent"`
 	// ExtraRegistryMirrors add more mirror for different ports
@@ -377,7 +380,7 @@ func (p *ProxyOption) unmarshal(unmarshal func(in []byte, out any) (err error), 
 	p.ExtraRegistryMirrors = pt.ExtraRegistryMirrors
 	p.ListenOption = pt.ListenOption
 	p.RegistryMirror = pt.RegistryMirror
-	p.Proxies = pt.Proxies
+	p.ProxyRules = pt.Proxies
 	p.HijackHTTPS = pt.HijackHTTPS
 	p.WhiteList = pt.WhiteList
 	p.MaxConcurrency = pt.MaxConcurrency
