@@ -27,6 +27,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-http-utils/headers"
@@ -124,6 +125,12 @@ func (um *uploadManager) initRouter(cfg *config.DaemonOption, logDir string) *gi
 
 	// Prometheus metrics
 	p := ginprometheus.NewPrometheus(PrometheusSubsystemName)
+	p.ReqCntURLLabelMappingFn = func(c *gin.Context) string {
+		if strings.Contains(c.Request.URL.Path, "download") { //too much label
+			return "download"
+		}
+		return c.Request.URL.Path
+	}
 	p.Use(r)
 
 	// Opentelemetry
