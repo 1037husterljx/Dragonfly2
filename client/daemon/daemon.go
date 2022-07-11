@@ -47,6 +47,7 @@ import (
 	"d7y.io/dragonfly/v2/client/daemon/storage"
 	"d7y.io/dragonfly/v2/client/daemon/upload"
 	"d7y.io/dragonfly/v2/client/util"
+	"d7y.io/dragonfly/v2/cmd/dependency"
 	logger "d7y.io/dragonfly/v2/internal/dflog"
 	"d7y.io/dragonfly/v2/manager/searcher"
 	"d7y.io/dragonfly/v2/pkg/dfnet"
@@ -359,6 +360,10 @@ func (*clientDaemon) prepareTCPListener(opt config.ListenOption, withTLS bool) (
 }
 
 func (cd *clientDaemon) Serve() error {
+	var (
+		watchers []func(daemon *config.DaemonOption)
+		interval = cd.Option.Reload.Interval.Duration
+	)
 	cd.GCManager.Start()
 	// prepare download service listen
 	if cd.Option.Download.DownloadGRPC.UnixListen == nil {
@@ -479,6 +484,9 @@ func (cd *clientDaemon) Serve() error {
 				})
 			}
 		}
+		watchers = append(watchers, func(daemon *config.DaemonOption) {
+			cd.ProxyManager.Watch(daemon.Proxy)
+		})
 	}
 
 	// serve upload service
@@ -608,6 +616,19 @@ func (cd *clientDaemon) Serve() error {
 				}
 				logger.Errorf("health http server error: %v", err)
 			}
+		}()
+	}
+
+	if len(watchers) > 0 && interval > 0 {
+		go func() {
+			dependency.WatchConfig(interval, func() any {
+				return config.NewDaemonConfig()
+			}, func(cfg any) {
+				daemonConfig := cfg.(*config.DaemonOption)
+				for _, w := range watchers {
+					w(daemonConfig)
+				}
+			})
 		}()
 	}
 

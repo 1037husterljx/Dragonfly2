@@ -34,136 +34,139 @@ import (
 	"d7y.io/dragonfly/v2/pkg/net/sn"
 )
 
-var peerHostConfig = DaemonOption{
-	AliveTime:   util.Duration{Duration: DefaultDaemonAliveTime},
-	GCInterval:  util.Duration{Duration: DefaultGCInterval},
-	KeepStorage: false,
-	Log:         logger.NewDefaultConfigs(),
-	Scheduler: SchedulerOption{
-		Manager: ManagerOption{
-			Enable:          false,
-			RefreshInterval: 5 * time.Minute,
-			SeedPeer: SeedPeerOption{
-				Enable:    false,
-				Type:      model.SeedPeerTypeSuperSeed,
-				ClusterID: 1,
-				KeepAlive: KeepAliveOption{
-					Interval: 5 * time.Second,
+var peerHostConfig = func() *DaemonOption {
+	return &DaemonOption{
+		AliveTime:   util.Duration{Duration: DefaultDaemonAliveTime},
+		GCInterval:  util.Duration{Duration: DefaultGCInterval},
+		KeepStorage: false,
+		Log:         logger.NewDefaultConfigs(),
+		Scheduler: SchedulerOption{
+			Manager: ManagerOption{
+				Enable:          false,
+				RefreshInterval: 5 * time.Minute,
+				SeedPeer: SeedPeerOption{
+					Enable:    false,
+					Type:      model.SeedPeerTypeSuperSeed,
+					ClusterID: 1,
+					KeepAlive: KeepAliveOption{
+						Interval: 5 * time.Second,
+					},
+				},
+				SelectStrategy: ManagerSelectStrategyManagerReady,
+			},
+			NetAddrs: []dfnet.NetAddr{
+				{
+					Type: dfnet.TCP,
+					Addr: "127.0.0.1:8002",
 				},
 			},
-			SelectStrategy: ManagerSelectStrategyManagerReady,
+			ScheduleTimeout: util.Duration{Duration: DefaultScheduleTimeout},
 		},
-		NetAddrs: []dfnet.NetAddr{
-			{
-				Type: dfnet.TCP,
-				Addr: "127.0.0.1:8002",
+		Host: HostOption{
+			Hostname:       fqdn.FQDNHostname,
+			ListenIP:       net.IPv4zero.String(),
+			AdvertiseIP:    ip.IPv4,
+			SN:             sn.SN,
+			SecurityDomain: "",
+			Location:       "",
+			IDC:            "",
+			NetTopology:    "",
+		},
+		Download: DownloadOption{
+			DefaultPattern:       PatternP2P,
+			CalculateDigest:      true,
+			PieceDownloadTimeout: 30 * time.Second,
+			GetPiecesMaxRetry:    100,
+			TotalRateLimit: util.RateLimit{
+				Limit: rate.Limit(DefaultTotalDownloadLimit),
 			},
-		},
-		ScheduleTimeout: util.Duration{Duration: DefaultScheduleTimeout},
-	},
-	Host: HostOption{
-		Hostname:       fqdn.FQDNHostname,
-		ListenIP:       net.IPv4zero.String(),
-		AdvertiseIP:    ip.IPv4,
-		SN:             sn.SN,
-		SecurityDomain: "",
-		Location:       "",
-		IDC:            "",
-		NetTopology:    "",
-	},
-	Download: DownloadOption{
-		DefaultPattern:       PatternP2P,
-		CalculateDigest:      true,
-		PieceDownloadTimeout: 30 * time.Second,
-		GetPiecesMaxRetry:    100,
-		TotalRateLimit: util.RateLimit{
-			Limit: rate.Limit(DefaultTotalDownloadLimit),
-		},
-		PerPeerRateLimit: util.RateLimit{
-			Limit: rate.Limit(DefaultPerPeerDownloadLimit),
-		},
-		DownloadGRPC: ListenOption{
-			Security: SecurityOption{
-				Insecure:  true,
-				TLSVerify: true,
+			PerPeerRateLimit: util.RateLimit{
+				Limit: rate.Limit(DefaultPerPeerDownloadLimit),
 			},
-			UnixListen: &UnixListenOption{
-				Socket: "/tmp/dfdaemon.sock",
-			},
-		},
-		PeerGRPC: ListenOption{
-			Security: SecurityOption{
-				Insecure:  true,
-				TLSVerify: true,
-			},
-			TCPListen: &TCPListenOption{
-				Listen: net.IPv4zero.String(),
-				PortRange: TCPListenPortRange{
-					Start: DefaultPeerStartPort,
-					End:   DefaultEndPort,
+			DownloadGRPC: ListenOption{
+				Security: SecurityOption{
+					Insecure:  true,
+					TLSVerify: true,
+				},
+				UnixListen: &UnixListenOption{
+					Socket: "/tmp/dfdaemon.sock",
 				},
 			},
-		},
-	},
-	Upload: UploadOption{
-		RateLimit: util.RateLimit{
-			Limit: rate.Limit(DefaultUploadLimit),
-		},
-		ListenOption: ListenOption{
-			Security: SecurityOption{
-				Insecure:  true,
-				TLSVerify: false,
-			},
-			TCPListen: &TCPListenOption{
-				Listen: net.IPv4zero.String(),
-				PortRange: TCPListenPortRange{
-					Start: DefaultUploadStartPort,
-					End:   DefaultEndPort,
+			PeerGRPC: ListenOption{
+				Security: SecurityOption{
+					Insecure:  true,
+					TLSVerify: true,
+				},
+				TCPListen: &TCPListenOption{
+					Listen: net.IPv4zero.String(),
+					PortRange: TCPListenPortRange{
+						Start: DefaultPeerStartPort,
+						End:   DefaultEndPort,
+					},
 				},
 			},
 		},
-	},
-	ObjectStorage: ObjectStorageOption{
-		Enable:      false,
-		Filter:      "Expires&Signature&ns",
-		MaxReplicas: DefaultObjectMaxReplicas,
-		ListenOption: ListenOption{
-			Security: SecurityOption{
-				Insecure:  true,
-				TLSVerify: true,
+		Upload: UploadOption{
+			RateLimit: util.RateLimit{
+				Limit: rate.Limit(DefaultUploadLimit),
 			},
-			TCPListen: &TCPListenOption{
-				Listen: net.IPv4zero.String(),
-				PortRange: TCPListenPortRange{
-					Start: DefaultObjectStorageStartPort,
-					End:   DefaultEndPort,
+
+			ListenOption: ListenOption{
+				Security: SecurityOption{
+					Insecure:  true,
+					TLSVerify: false,
+				},
+				TCPListen: &TCPListenOption{
+					Listen: net.IPv4zero.String(),
+					PortRange: TCPListenPortRange{
+						Start: DefaultUploadStartPort,
+						End:   DefaultEndPort,
+					},
 				},
 			},
 		},
-	},
-	Proxy: &ProxyOption{
-		ListenOption: ListenOption{
-			Security: SecurityOption{
-				Insecure:  true,
-				TLSVerify: false,
+		ObjectStorage: ObjectStorageOption{
+			Enable:      false,
+			Filter:      "Expires&Signature&ns",
+			MaxReplicas: DefaultObjectMaxReplicas,
+			ListenOption: ListenOption{
+				Security: SecurityOption{
+					Insecure:  true,
+					TLSVerify: true,
+				},
+				TCPListen: &TCPListenOption{
+					Listen: net.IPv4zero.String(),
+					PortRange: TCPListenPortRange{
+						Start: DefaultObjectStorageStartPort,
+						End:   DefaultEndPort,
+					},
+				},
 			},
-			TCPListen: &TCPListenOption{
-				Listen:    net.IPv4zero.String(),
-				PortRange: TCPListenPortRange{},
+		},
+		Proxy: &ProxyOption{
+			ListenOption: ListenOption{
+				Security: SecurityOption{
+					Insecure:  true,
+					TLSVerify: false,
+				},
+				TCPListen: &TCPListenOption{
+					Listen:    net.IPv4zero.String(),
+					PortRange: TCPListenPortRange{},
+				},
 			},
 		},
-	},
-	Storage: StorageOption{
-		TaskExpireTime: util.Duration{
-			Duration: DefaultTaskExpireTime,
+		Storage: StorageOption{
+			TaskExpireTime: util.Duration{
+				Duration: DefaultTaskExpireTime,
+			},
+			StoreStrategy:          AdvanceLocalTaskStoreStrategy,
+			Multiplex:              false,
+			DiskGCThresholdPercent: 95,
 		},
-		StoreStrategy:          AdvanceLocalTaskStoreStrategy,
-		Multiplex:              false,
-		DiskGCThresholdPercent: 95,
-	},
-	Reload: ReloadOption{
-		Interval: util.Duration{
-			Duration: time.Minute,
+		Reload: ReloadOption{
+			Interval: util.Duration{
+				Duration: time.Minute,
+			},
 		},
-	},
+	}
 }

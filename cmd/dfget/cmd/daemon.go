@@ -89,7 +89,7 @@ func init() {
 		// Initialize default daemon config
 		cfg = config.NewDaemonConfig()
 		// Initialize cobra
-		dependency.InitCobra(daemonCmd, true, cfg)
+		dependency.InitCommandAndConfig(daemonCmd, true, cfg)
 
 		flags := daemonCmd.Flags()
 		flags.Int("launcher", -1, "pid of process launching daemon, a negative number implies that the daemon is started directly by the user")
@@ -104,17 +104,21 @@ func initDaemonDfpath(cfg *config.DaemonOption) (dfpath.Dfpath, error) {
 		options = append(options, dfpath.WithWorkHome(cfg.WorkHome))
 	}
 
-	if cfg.CacheDir != "" {
-		options = append(options, dfpath.WithCacheDir(cfg.CacheDir))
-	}
-
 	if cfg.LogDir != "" {
 		options = append(options, dfpath.WithLogDir(cfg.LogDir))
 	}
 
-	if cfg.DataDir != "" {
-		options = append(options, dfpath.WithDataDir(cfg.DataDir))
+	cacheDir := dfpath.DefaultCacheDir
+	if cfg.CacheDir != "" {
+		cacheDir = cfg.CacheDir
 	}
+	options = append(options, dfpath.WithCacheDir(cacheDir))
+
+	dataDir := dfpath.DefaultDataDir
+	if cfg.DataDir != "" {
+		dataDir = cfg.DataDir
+	}
+	options = append(options, dfpath.WithDataDir(dataDir))
 
 	return dfpath.New(options...)
 }

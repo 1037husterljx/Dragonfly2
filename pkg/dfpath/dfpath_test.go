@@ -21,6 +21,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -44,13 +45,14 @@ func TestNew(t *testing.T) {
 			expect: func(t *testing.T, options []Option) {
 				assert := assert.New(t)
 				cache.Once = sync.Once{}
-				cache.errs = []error{}
+				cache.err = &multierror.Error{}
 				d, err := New(options...)
 				assert.NoError(err)
 				assert.Equal(d.WorkHome(), DefaultWorkHome)
-				assert.Equal(d.CacheDir(), DefaultCacheDir)
+				assert.Equal(d.CacheDir(), "")
 				assert.Equal(d.LogDir(), DefaultLogDir)
-				assert.Equal(d.DataDir(), DefaultDataDir)
+				assert.Equal(d.DataDir(), "")
+				assert.Equal(d.PluginDir(), DefaultPluginDir)
 			},
 		},
 		{
@@ -59,13 +61,15 @@ func TestNew(t *testing.T) {
 			expect: func(t *testing.T, options []Option) {
 				assert := assert.New(t)
 				cache.Once = sync.Once{}
-				cache.errs = []error{}
+				cache.err = &multierror.Error{}
 				d, err := New(options...)
 				assert.NoError(err)
 				assert.Equal(d.WorkHome(), "foo")
 				assert.Equal(d.CacheDir(), filepath.Join("foo", "cache"))
 				assert.Equal(d.LogDir(), filepath.Join("foo", "logs"))
 				assert.Equal(d.DataDir(), filepath.Join("foo", "data"))
+				assert.Equal(d.PluginDir(), filepath.Join("foo", "plugins"))
+
 			},
 		},
 		{
@@ -74,13 +78,14 @@ func TestNew(t *testing.T) {
 			expect: func(t *testing.T, options []Option) {
 				assert := assert.New(t)
 				cache.Once = sync.Once{}
-				cache.errs = []error{}
+				cache.err = &multierror.Error{}
 				d, err := New(options...)
 				assert.NoError(err)
 				assert.Equal(d.WorkHome(), DefaultWorkHome)
 				assert.Equal(d.CacheDir(), "foo")
 				assert.Equal(d.LogDir(), DefaultLogDir)
-				assert.Equal(d.DataDir(), DefaultDataDir)
+				assert.Equal(d.DataDir(), "")
+				assert.Equal(d.PluginDir(), DefaultPluginDir)
 			},
 		},
 		{
@@ -89,13 +94,30 @@ func TestNew(t *testing.T) {
 			expect: func(t *testing.T, options []Option) {
 				assert := assert.New(t)
 				cache.Once = sync.Once{}
-				cache.errs = []error{}
+				cache.err = &multierror.Error{}
 				d, err := New(options...)
 				assert.NoError(err)
 				assert.Equal(d.WorkHome(), DefaultWorkHome)
-				assert.Equal(d.CacheDir(), DefaultCacheDir)
+				assert.Equal(d.CacheDir(), "")
 				assert.Equal(d.LogDir(), "foo")
-				assert.Equal(d.DataDir(), DefaultDataDir)
+				assert.Equal(d.DataDir(), "")
+				assert.Equal(d.PluginDir(), DefaultPluginDir)
+			},
+		},
+		{
+			name:    "new dfpath by pluginDir",
+			options: []Option{WithPluginDir("foo")},
+			expect: func(t *testing.T, options []Option) {
+				assert := assert.New(t)
+				cache.Once = sync.Once{}
+				cache.err = &multierror.Error{}
+				d, err := New(options...)
+				assert.NoError(err)
+				assert.Equal(d.WorkHome(), DefaultWorkHome)
+				assert.Equal(d.CacheDir(), "")
+				assert.Equal(d.LogDir(), DefaultLogDir)
+				assert.Equal(d.DataDir(), "")
+				assert.Equal(d.PluginDir(), "foo")
 			},
 		},
 	}
