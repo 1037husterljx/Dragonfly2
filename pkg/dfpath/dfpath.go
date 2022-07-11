@@ -68,6 +68,7 @@ func WithWorkHome(dir string) Option {
 		d.cacheDir = filepath.Join(d.workHome, "cache")
 		d.logDir = filepath.Join(d.workHome, "logs")
 		d.dataDir = filepath.Join(d.workHome, "data")
+		d.pluginDir = filepath.Join(d.workHome, "plugins")
 	}
 }
 

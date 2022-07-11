@@ -66,6 +66,7 @@ var peerHostConfig = func() *DaemonOption {
 			Hostname:       fqdn.FQDNHostname,
 			ListenIP:       "0.0.0.0",
 			AdvertiseIP:    ip.IPv4,
+			SN:             sn.SN,
 			SecurityDomain: "",
 			Location:       "",
 			IDC:            "",
@@ -101,6 +102,13 @@ var peerHostConfig = func() *DaemonOption {
 						Start: DefaultPeerStartPort,
 						End:   DefaultEndPort,
 					},
+				},
+			},
+		},
+		Upload: UploadOption{
+			RateLimit: util.RateLimit{
+				Limit: rate.Limit(DefaultUploadLimit),
+			},
 			ListenOption: ListenOption{
 				Security: SecurityOption{
 					Insecure:  true,
